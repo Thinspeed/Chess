@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\GLFW\GLFW.cpp" />
+    <ClCompile Include="src\GLFW\Window.cpp" />
+    <ClCompile Include="src\GL\Program.cpp" />
+    <ClCompile Include="src\GL\VAO.cpp" />
+    <ClCompile Include="src\Game\Piece.cpp" />
+    <ClCompile Include="src\Game\Pawn.cpp" />
+    <ClCompile Include="src\Game\Map.cpp" />
+    <ClCompile Include="src\Game\Cell.cpp" />
+    <ClCompile Include="src\GLFW\texture.cpp" />
+    <ClCompile Include="src\Game\Rook.cpp" />
+    <ClCompile Include="src\Game\Officer.cpp" />
+    <ClCompile Include="src\Game\Horse.cpp" />
+    <ClCompile Include="src\Game\Queen.cpp" />
+    <ClCompile Include="src\Game\King.cpp" />
+    <ClCompile Include="src\Net\Server.cpp" />
+    <ClCompile Include="src\Net\Client.cpp" />
+    <ClCompile Include="src\Net\Net.cpp" />
+    <ClCompile Include="src\Game\Game.cpp" />
+    <ClCompile Include="src\GL\Model.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GLFW\gl.h" />
+    <ClInclude Include="src\GLFW\GLFW.h" />
+    <ClInclude Include="src\GLFW\Window.h" />
+    <ClInclude Include="src\GL\Program.h" />
+    <ClInclude Include="src\GL\VAO.h" />
+    <ClInclude Include="libs\include\image\stb_image.h" />
+    <ClInclude Include="src\Game\Piece.h" />
+    <ClInclude Include="src\Game\Pawn.h" />
+    <ClInclude Include="src\Game\Map.h" />
+    <ClInclude Include="src\Game\Cell.h" />
+    <ClInclude Include="src\GLFW\texture.hpp" />
+    <ClInclude Include="src\Game\Rook.h" />
+    <ClInclude Include="src\Game\Officer.h" />
+    <ClInclude Include="src\Game\Horse.h" />
+    <ClInclude Include="src\Game\Queen.h" />
+    <ClInclude Include="src\Game\King.h" />
+    <ClInclude Include="src\Net\Server.h" />
+    <ClInclude Include="src\Net\Client.h" />
+    <ClInclude Include="src\Net\Net.h" />
+    <ClInclude Include="src\Game\Game.h" />
+    <ClInclude Include="src\GL\Model.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\glsl\defaultShader.vert" />
+    <None Include="res\glsl\defaultShader.frag" />
+    <None Include="res\glsl\3dShader.frag" />
+    <None Include="res\glsl\3dShader.vert" />
+  </ItemGroup>
+</Project>
