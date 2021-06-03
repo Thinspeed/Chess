@@ -2,8 +2,11 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Client.h"
 #include <iostream>
+#include <mutex>
 #include <sys/types.h>
 #include <winsock2.h>
+
+std::mutex a;
 
 Client::Client()
 {
@@ -66,11 +69,13 @@ int* Client::receiveData()
 
 	try
 	{
+		a.lock();
 		int bytes = recv(socket_, buf, max_client_buffer_size - 1, 0);
 		if (bytes == SOCKET_ERROR) {
 			closesocket(socket_);
 			throw std::runtime_error("receive failed: ");
 		}
+		a.unlock();
 	}
 	catch (const std::exception& error)
 	{
