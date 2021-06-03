@@ -201,13 +201,10 @@ void Map::SelectePiece(Color myColor, Point coord)
 		selectedPiece->isSelected = false;
 	}
 	
-	if (myColor == map[coord.Y][coord.X]->mPiece->pieceColor)
+	if (map[coord.Y][coord.X]->mPiece != nullptr && myColor == map[coord.Y][coord.X]->mPiece->pieceColor)
 	{
 		selectedPiece = map[coord.Y][coord.X]->mPiece;
-		if (selectedPiece)
-		{
-			selectedPiece->isSelected = true;
-		}
+		selectedPiece->isSelected = true;
 	}
 }
 
