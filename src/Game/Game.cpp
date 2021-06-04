@@ -79,7 +79,7 @@ void Game::finishMove(Point from, Point to)
 	int *buf = (int*)malloc(sizeof(int) * 5);
 	buf[0] = (int)Code::PieceMove; buf[1] = from.X; buf[2] = from.Y; buf[3] = to.X; buf[4] = to.Y;
 	//auto a = [](Game* game, int* buf) -> void { game->net->sendData(buf, 5); game->waitForMove(); };
-	sendRecvThread.detach();
+	std::thread sendRecvThread;
 	sendRecvThread = std::thread([this](int* buf) -> void { net->sendData(buf, 5); waitForMove(); }, buf);
 	IsMyTurn = false;
 }
