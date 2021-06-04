@@ -6,7 +6,7 @@
 Game::Game()
 {
 	net = (Net*)(new Server);
-	netThread = std::thread([this] { ((Server*)net)->Listen(); sendGameInfo();  });
+	netThread = std::thread([this] { ((Server*)net)->Listen(); sendGameInfo(); });
 }
 
 Game::Game(std::string ip)
@@ -23,10 +23,6 @@ void Game::sendGameInfo()
 	std::cout << ((int)myColor == 1 ? "White" : "Black");
 	int buf[2] = { (int)Code::Color, (int)myColor * -1 };
 	net->sendData(buf, 2);
-	if (!IsMyTurn)
-	{
-		waitForMove();
-	}
 }
 
 void Game::receiveGameInfo()
@@ -38,10 +34,6 @@ void Game::receiveGameInfo()
 		IsMyTurn = (int)myColor + 1;
 		IsConnected = true;
 		std::cout << ((int)myColor == 1 ? "White" : "Black");
-		if (!IsMyTurn)
-		{
-			waitForMove();
-		}
 	}
 	else
 	{
@@ -79,7 +71,6 @@ void Game::finishMove(Point from, Point to)
 	int *buf = (int*)malloc(sizeof(int) * 5);
 	buf[0] = (int)Code::PieceMove; buf[1] = from.X; buf[2] = from.Y; buf[3] = to.X; buf[4] = to.Y;
 	//auto a = [](Game* game, int* buf) -> void { game->net->sendData(buf, 5); game->waitForMove(); };
-	sendRecvThread.detach();
 	sendRecvThread = std::thread([this](int* buf) -> void { net->sendData(buf, 5); waitForMove(); }, buf);
 	IsMyTurn = false;
 }
