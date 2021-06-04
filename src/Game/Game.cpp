@@ -79,8 +79,6 @@ void Game::waitForMove()
 {
 	while (!IsGameFinished)
 	{
-		if (!IsMyTurn)
-		{
 			int* buf;
 			buf = net->receiveData();
 			if ((Code)buf[0] == Code::PieceMove)
@@ -93,6 +91,6 @@ void Game::waitForMove()
 			}
 
 			IsMyTurn = true;
-		}
+		
 	}
 }
