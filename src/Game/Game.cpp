@@ -58,7 +58,6 @@ void Game::ProcessMapInput(float xPos, float yPos)
 		if (!IsMyTurn)
 		{
 			finishMove(from, Point(j, i));
-			sendRecvThread = std::thread([this] { waitForMove(); });
 		}
 	}
 	else
