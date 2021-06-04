@@ -85,6 +85,8 @@ void Game::finishMove(Point from, Point to)
 	//auto a = [](Game* game, int* buf) -> void { game->net->sendData(buf, 5); game->waitForMove(); };
 	net->sendData(buf, 5);
 	IsMyTurn = false;
+	sendRecvThread = std::thread([this] { waitForMove(); });
+	sendRecvThread.detach();
 }
 
 void Game::waitForMove()
@@ -99,6 +101,13 @@ void Game::waitForMove()
 			throw std::runtime_error("Mistake in received data");
 		}
 	}
+
+	//while (!IsGameFinished)
+	//{
+
+	//	while (IsMyTurn) {}
+	//	
+	//}
 	
 	IsMyTurn = true;
 }

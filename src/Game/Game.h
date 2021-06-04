@@ -23,6 +23,7 @@ public:
 	Color myColor;
 	bool IsConnected = false;
 	bool IsMyTurn = false;
+	bool IsGameFinished = false;
 	Map* chessMap;
 	Game();
 	Game(std::string ip);
