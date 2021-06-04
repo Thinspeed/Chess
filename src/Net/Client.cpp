@@ -52,6 +52,8 @@ void Client::Connect(std::string ip)
 
 bool Client::sendData(int* buf, int length)
 {
+
+	
 	if (send(socket_, (char*)buf, length * sizeof(int) / sizeof(char), 0) != 0)
 	{
 		return false;
