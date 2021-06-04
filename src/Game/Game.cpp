@@ -23,6 +23,11 @@ void Game::sendGameInfo()
 	std::cout << ((int)myColor == 1 ? "White" : "Black");
 	int buf[2] = { (int)Code::Color, (int)myColor * -1 };
 	net->sendData(buf, 2);
+	if (!IsMyTurn)
+	{
+		sendRecvThread = std::thread([this] { waitForMove(); });
+		sendRecvThread.detach();
+	}
 }
 
 void Game::receiveGameInfo()
@@ -38,6 +43,12 @@ void Game::receiveGameInfo()
 	else
 	{
 		throw std::runtime_error("Check connection with server");
+	}
+	
+	if (!IsMyTurn)
+	{
+		sendRecvThread = std::thread([this] { waitForMove(); });
+		sendRecvThread.detach();
 	}
 }
 
