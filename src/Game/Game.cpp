@@ -6,13 +6,13 @@
 Game::Game()
 {
 	net = (Net*)(new Server);
-	netThread = std::thread([this] { ((Server*)net)->Listen(); sendGameInfo(); });
+	netThread = std::thread([this] { ((Server*)net)->Listen(); sendGameInfo(); waitForMove(); });
 }
 
 Game::Game(std::string ip)
 {
 	net = (Net*)(new Client);
-	netThread = std::thread([this, ip] { ((Client*)net)->Connect(ip); receiveGameInfo(); });
+	netThread = std::thread([this, ip] { ((Client*)net)->Connect(ip); receiveGameInfo(); waitForMove();  });
 }
 
 void Game::sendGameInfo()
@@ -23,11 +23,6 @@ void Game::sendGameInfo()
 	std::cout << ((int)myColor == 1 ? "White" : "Black");
 	int buf[2] = { (int)Code::Color, (int)myColor * -1 };
 	net->sendData(buf, 2);
-	if (!IsMyTurn)
-	{
-		sendRecvThread = std::thread([this] { waitForMove(); });
-		sendRecvThread.detach();
-	}
 }
 
 void Game::receiveGameInfo()
@@ -43,12 +38,6 @@ void Game::receiveGameInfo()
 	else
 	{
 		throw std::runtime_error("Check connection with server");
-	}
-	
-	if (!IsMyTurn)
-	{
-		sendRecvThread = std::thread([this] { waitForMove(); });
-		sendRecvThread.detach();
 	}
 }
 
@@ -85,29 +74,26 @@ void Game::finishMove(Point from, Point to)
 	//auto a = [](Game* game, int* buf) -> void { game->net->sendData(buf, 5); game->waitForMove(); };
 	net->sendData(buf, 5);
 	IsMyTurn = false;
-	sendRecvThread = std::thread([this] { waitForMove(); });
-	sendRecvThread.detach();
 }
 
 void Game::waitForMove()
 {
-	int* buf;
-	buf = net->receiveData();
-	if ((Code)buf[0] == Code::PieceMove)
+	while (!IsGameFinished)
 	{
-		chessMap->SelectePiece(Color((int)myColor * -1), Point(buf[1], buf[2]));
-		if (!chessMap->TryToMovePiece(Point(buf[1], buf[2]), Point(buf[3], buf[4])))
+		if (!IsMyTurn)
 		{
-			throw std::runtime_error("Mistake in received data");
+			int* buf;
+			buf = net->receiveData();
+			if ((Code)buf[0] == Code::PieceMove)
+			{
+				chessMap->SelectePiece(Color((int)myColor * -1), Point(buf[1], buf[2]));
+				if (!chessMap->TryToMovePiece(Point(buf[1], buf[2]), Point(buf[3], buf[4])))
+				{
+					throw std::runtime_error("Mistake in received data");
+				}
+			}
+
+			IsMyTurn = true;
 		}
 	}
-
-	//while (!IsGameFinished)
-	//{
-
-	//	while (IsMyTurn) {}
-	//	
-	//}
-	
-	IsMyTurn = true;
 }
