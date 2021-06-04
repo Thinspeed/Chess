@@ -13,6 +13,7 @@ class Game
 {
 private:
 	std::thread netThread;
+	std::thread sendRecvThread;
 	Net* net;
 	void sendGameInfo();
 	void receiveGameInfo();
