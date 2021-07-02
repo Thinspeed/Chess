@@ -65,7 +65,7 @@ void Server::bindSoket()
 
 void Server::Listen()
 {
-	if (listen(socket_, 5) == SOCKET_ERROR)
+	if (listen(socket_, 1) == SOCKET_ERROR)
 	{
 		throw std::runtime_error("listen failed with error: " + WSAGetLastError());
 	}
@@ -99,10 +99,16 @@ int* Server::receiveData()
 	int bytes = recv(client, buf, max_client_buffer_size - 1, 0);
 	if (bytes == SOCKET_ERROR) {
 		closesocket(client);
-		throw std::runtime_error("receive failed: " + bytes);
+		buf[0] = 2; buf[2] = '\0';
 	}
 	
 	return (int*)buf;
+}
+
+void Server::closeConnection()
+{
+	closesocket(client);
+	closesocket(socket_);
 }
 
 Server::~Server()

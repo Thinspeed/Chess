@@ -92,6 +92,14 @@ int* Client::receiveData()
 	return (int*)buf;
 }
 
+
+void Client::closeConnection()
+{
+	closesocket(socket_);
+}
+
 Client::~Client()
 {
+	closesocket(socket_);
+	WSACleanup();
 }

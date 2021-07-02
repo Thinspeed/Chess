@@ -16,6 +16,8 @@ Map::Map(float width)
 {
 	cellWidth = width;
 	arrangePieces();
+	WhiteKingPos = Point(3, 0);
+	BlackKingPos = Point(3, 7);
 	stbi_set_flip_vertically_on_load(false);
 	whiteSquareTexture = loadTexture("textures/whiteSquareTexture.jpg");
 	blackSquareTexture = loadTexture("textures/blackSquareTexture.jpg");
@@ -133,19 +135,171 @@ bool Map::TryToMovePiece(Point from, Point to)
 		{
 			result = selectedPiece->TryToKillPiece(map, to);
 		}
-	}
-
-	if (result)
-	{
-		delete map[to.Y][to.X]->mPiece;
-		map[to.Y][to.X]->mPiece = selectedPiece;
-		selectedPiece->currentPos = to;
-		map[from.Y][from.X]->mPiece = nullptr;
+		else if (from == WhiteKingPos || from == BlackKingPos)
+		{
+			return TryCastle(selectedPiece->pieceColor, to);
+		}
 	}
 	
 	UnselectPiece();
+	if (result)
+	{
+		Piece* enemyPiece = map[to.Y][to.X]->mPiece;
+		Piece* myPiece = map[from.Y][from.X]->mPiece;
+		map[to.Y][to.X]->mPiece = myPiece;
+		map[from.Y][from.X]->mPiece = nullptr;
+		if (IsKingUnderAttack(myPiece->pieceColor))
+		{
+			map[to.Y][to.X]->mPiece = enemyPiece;
+			map[from.Y][from.X]->mPiece = myPiece;
+			return false;
+		}
+
+		delete enemyPiece;
+		map[to.Y][to.X]->mPiece = myPiece;
+		myPiece->currentPos = to;
+		map[from.Y][from.X]->mPiece = nullptr;
+		if (from.X == WhiteKingPos.X && from.Y == WhiteKingPos.Y)
+		{
+			WhiteKingPos = from;
+		}
+		else if (from.X == BlackKingPos.X && from.Y == BlackKingPos.Y)
+		{
+			BlackKingPos = from;
+		}
+	}
+	
 	return result;
 }
+
+
+bool Map::TryCastle(Color color, Point pos)
+{
+	King* king = dynamic_cast<King*>(selectedPiece);
+	UnselectPiece();
+	Rook* rook = dynamic_cast<Rook*>(map[pos.Y][pos.X]->mPiece);
+	if (king == nullptr || king->WasMoved || IsKingUnderAttack(color))
+	{
+		return false;
+	}
+
+	if (color == Color::White)
+	{
+		WhiteKingPos = Point(1, pos.Y);
+	}
+	else
+	{
+		BlackKingPos = Point(1, pos.Y);
+	}
+	
+	if (IsKingUnderAttack(color) || rook == nullptr || rook->WasMoved || !rook->MakeMove(map, Point(2, pos.Y)))
+	{
+		if (color == Color::White)
+		{
+			WhiteKingPos = Point(3, pos.Y);
+		}
+		else
+		{
+			BlackKingPos = Point(3, pos.Y);
+		}
+		
+		return false;
+	}
+	
+	map[pos.Y][1]->mPiece = map[pos.Y][3]->mPiece;
+	map[pos.Y][3]->mPiece = nullptr;
+	map[pos.Y][1]->mPiece->currentPos = Point(1, pos.Y);
+	map[pos.Y][2]->mPiece = map[pos.Y][0]->mPiece;
+	map[pos.Y][0]->mPiece = nullptr;
+	map[pos.Y][2]->mPiece->currentPos = Point(2, pos.Y);
+	return true;
+}
+
+
+/**
+ * \brief Проверяет находится ли клетка под ударом
+ * \param pos Клетка, которую проверяют
+ * \param from Клетка, где стоит фигура
+ */
+bool Map::IsCellUnderAttack(Point pos, Point from)
+{
+	if (map[from.Y][from.X] != nullptr && (from.X != pos.X || from.Y != pos.Y))
+	{
+		return map[from.Y][from.X]->mPiece->TryToKillPiece(map, pos);
+	}
+
+	return false;
+}
+
+
+bool Map::IsKingUnderAttack(Color color)
+{
+	Point kingPos = color == Color::White ? WhiteKingPos : BlackKingPos;
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (map[i][j]->mPiece != nullptr && map[i][j]->mPiece->pieceColor != color && IsCellUnderAttack(kingPos, Point(j, i)))
+			{
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+
+bool Map::IsCheckMate(Color color, Point from)
+{
+	Point kingPos = color == Color::White ? WhiteKingPos : BlackKingPos;
+	for (int dx = -1; dx < 2; dx++)
+	{
+		for (int dy = -1; dy < 2; dy++)
+		{
+			if ((kingPos.X + dx < 8) && (kingPos.X + dx > -1) && (kingPos.Y + dy < 8) && (kingPos.Y + dy > -1))
+			{
+				if (map[kingPos.Y][kingPos.X]->mPiece->TryToKillPiece(map, Point(kingPos.Y + dy, kingPos.X + dx)))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	std::vector<Point> posToBlock;
+	int deltaX = from.X - kingPos.X;
+	deltaX = deltaX == 0 ? 0 : deltaX / abs(deltaX);
+	int deltaY = from.Y - kingPos.Y;
+	deltaY = deltaY == 0 ? 0 : deltaY / abs(deltaY);
+	Point pos(kingPos.X, kingPos.Y);
+	do
+	{
+		pos.X += deltaX;
+		pos.Y += deltaY;
+		posToBlock.push_back(pos);
+	}
+	while (pos != from);
+
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (map[i][j]->mPiece != nullptr && map[i][j]->mPiece->pieceColor == color)
+			{
+				for (int k = 0; k < posToBlock.size(); k++)
+				{
+					if (map[i][j]->mPiece->TryToKillPiece(map, posToBlock[k]))
+					{
+						return false;
+					}
+				}
+			}
+		}
+	}
+	return true;
+}
+
 
 /**
  * \brief Рисует всю шахматную доску, включая фигуры
@@ -199,6 +353,7 @@ void Map::SelectePiece(Color myColor, Point coord)
 	if (selectedPiece)
 	{
 		selectedPiece->isSelected = false;
+		selectedPiece = nullptr;
 	}
 	
 	if (map[coord.Y][coord.X]->mPiece != nullptr && myColor == map[coord.Y][coord.X]->mPiece->pieceColor)

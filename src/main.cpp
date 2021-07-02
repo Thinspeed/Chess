@@ -5,6 +5,7 @@
 #include "Net/Client.h"
 #include "GLFW/GLFW.h"
 #include "GLFW/Window.h"
+#include <conio.h>
 
 int ScreenWidth = 1920;
 int ScreenHeight = 1080;
@@ -26,6 +27,6 @@ int main()
 		Sleep(3000);
 	}
 
-
+	_getch();
 	return 0;
 }

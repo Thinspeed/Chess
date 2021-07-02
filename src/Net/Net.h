@@ -12,5 +12,6 @@ protected:
 public:
 	virtual bool sendData(int* buf, int length);
 	virtual int* receiveData();
+	virtual void closeConnection();
 };
 

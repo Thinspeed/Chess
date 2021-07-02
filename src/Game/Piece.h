@@ -24,6 +24,16 @@ struct Point
 		X = x;
 		Y = y;
 	}
+
+	bool operator == (Point value)
+	{
+		return (X == value.X) && (Y == value.Y);
+	}
+
+	bool operator != (Point value)
+	{
+		return !(Point(X, Y) == value);
+	}
 };
 
 class Cell;

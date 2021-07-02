@@ -9,3 +9,7 @@ int* Net::receiveData()
 {
 	return nullptr;
 }
+
+void Net::closeConnection()
+{
+}

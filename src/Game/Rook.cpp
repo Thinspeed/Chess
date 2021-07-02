@@ -5,6 +5,7 @@ Rook::Rook(const Color color, Point coord, float cellWidth)
 {
 	pieceColor = color;
 	currentPos = coord;
+	WasMoved = currentPos.X;
 	vao_.addVertexBufferObject({
 		{ 0, 0, -1 },
 		{ 0, cellWidth, -1 },
@@ -38,6 +39,7 @@ bool Rook::MakeMove(Cell* map[8][8], Point coord)
 			pos += delta;
 		}
 
+		WasMoved = true;
 		return true;
 	}
 
@@ -55,6 +57,7 @@ bool Rook::MakeMove(Cell* map[8][8], Point coord)
 			pos += delta;
 		}
 
+		WasMoved = true;
 		return true;
 	}
 	

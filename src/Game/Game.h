@@ -14,6 +14,8 @@ class Game
 private:
 	std::thread netThread;
 	Net* net;
+	Point kingPos;
+	bool isKingUnderAttack = false;
 	void sendGameInfo();
 	void receiveGameInfo();
 	void finishMove(Point from, Point to);
@@ -27,5 +29,7 @@ public:
 	Game();
 	Game(std::string ip);
 	void ProcessMapInput(float xPos, float yPos);
+	void FinishGame();
+	~Game();
 };
 

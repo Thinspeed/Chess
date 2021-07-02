@@ -17,10 +17,13 @@ Game::Game(std::string ip)
 
 void Game::sendGameInfo()
 {
-	myColor = (Color)((rand() % 2 == 0) ? 1 : -1);
+	srand(time(nullptr));
+	//myColor = (Color)((rand() % 2 == 0) ? 1 : -1);
+	myColor = Color::Black;
 	IsMyTurn = (int)myColor + 1;
+	kingPos = Point(3, myColor == Color::White ? 0 : 7);
 	IsConnected = true;
-	std::cout << ((int)myColor == 1 ? "White" : "Black");
+	std::cout << ((int)myColor == 1 ? "White" : "Black\n");
 	int buf[2] = { (int)Code::Color, (int)myColor * -1 };
 	net->sendData(buf, 2);
 }
@@ -32,8 +35,9 @@ void Game::receiveGameInfo()
 	{
 		myColor = (Color)buf[1];
 		IsMyTurn = (int)myColor + 1;
+		kingPos = Point(3, myColor == Color::White ? 0 : 7);
 		IsConnected = true;
-		std::cout << ((int)myColor == 1 ? "White" : "Black");
+		std::cout << ((int)myColor == 1 ? "White" : "Black\n");
 	}
 	else
 	{
@@ -57,6 +61,12 @@ void Game::ProcessMapInput(float xPos, float yPos)
 		IsMyTurn = !chessMap->TryToMovePiece(from, Point(j, i));
 		if (!IsMyTurn)
 		{
+			if (from.X == kingPos.X && from.Y == kingPos.Y)
+			{
+				kingPos.X = abs(kingPos.X - j) == 1 ? j : 1;
+				kingPos.Y = i;
+			}
+			
 			finishMove(from, Point(j, i));
 		}
 	}
@@ -79,18 +89,56 @@ void Game::waitForMove()
 {
 	while (!IsGameFinished)
 	{
-			int* buf;
-			buf = net->receiveData();
-			if ((Code)buf[0] == Code::PieceMove)
+		int* buf;
+		buf = net->receiveData();
+		if ((Code)buf[0] == Code::PieceMove)
+		{
+			Point from = Point(buf[1], buf[2]);
+			Point to = Point(buf[3], buf[4]);
+			chessMap->SelectePiece(Color((int)myColor * -1), from);
+			
+			if (!chessMap->TryToMovePiece(from, to))
 			{
-				chessMap->SelectePiece(Color((int)myColor * -1), Point(buf[1], buf[2]));
-				if (!chessMap->TryToMovePiece(Point(buf[1], buf[2]), Point(buf[3], buf[4])))
-				{
-					throw std::runtime_error("Mistake in received data");
-				}
+				throw std::runtime_error("Received wrong data, could not move piece that way");
 			}
 
-			IsMyTurn = true;
+			isKingUnderAttack = chessMap->IsKingUnderAttack(myColor);
+			if (isKingUnderAttack && chessMap->IsCheckMate(myColor, to))
+			{
+				IsGameFinished = true;
+			}
+		}
+		else if ((Code)buf[0] == Code::EndOfGame)
+		{
+			IsGameFinished = true;
+		}
+		else
+		{
+			throw std::runtime_error("Wrong code in data, code: " + buf[0]);
+		}
 		
+		IsMyTurn = true;
+	}
+
+	FinishGame();
+}
+
+void Game::FinishGame()
+{
+	int* buf = (int*)malloc(sizeof(int));
+	buf[0] = (int)Code::EndOfGame;
+	IsGameFinished = true;
+	net->sendData(buf, 1);
+}
+
+Game::~Game()
+{
+	netThread.join();
+	delete chessMap;
+	if (net != nullptr)
+	{
+		net->closeConnection();
+		delete net;
+		net = nullptr;
 	}
 }

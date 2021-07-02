@@ -10,6 +10,7 @@ public:
 	void Connect(std::string ip);
 	bool sendData(int* buf, int length) override;
 	int* receiveData() override;
+	void closeConnection() override;
 	~Client();
 };
 

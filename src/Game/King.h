@@ -5,7 +5,8 @@ class King :
 {
 private:
 public:
-	King(const Color color, Point coord, float cellWidth);
-	bool MakeMove(Cell* map[8][8], Point coord) override;
+	bool WasMoved = false;
+	King(const Color color, Point pos, float cellWidth);
+	bool MakeMove(Cell* map[8][8], Point pos) override;
 };
 

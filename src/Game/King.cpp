@@ -1,10 +1,11 @@
 #include "King.h"
+#include "Rook.h"
 #include "GLFW/Window.h"
 
-King::King(const Color color, Point coord, float cellWidth)
+King::King(const Color color, Point pos, float cellWidth)
 {
 	pieceColor = color;
-	currentPos = coord;
+	currentPos = pos;
 	vao_.addVertexBufferObject({
 		{ 0, 0, -1 },
 		{ 0, cellWidth, -1 },
@@ -22,13 +23,25 @@ King::King(const Color color, Point coord, float cellWidth)
 	vao_.addIndices({ 0, 1, 2, 0, 2, 3 });
 }
 
-bool King::MakeMove(Cell* map[8][8], Point coord)
+bool King::MakeMove(Cell* map[8][8], Point pos)
 {
-	if (((coord.X - currentPos.X == 0) || abs(coord.X - currentPos.X) == 1) &&
-		((coord.Y - currentPos.Y == 0) || abs(coord.Y - currentPos.Y) == 1))
+	if (((pos.X - currentPos.X == 0) || abs(pos.X - currentPos.X) == 1) &&
+		((pos.Y - currentPos.Y == 0) || abs(pos.Y - currentPos.Y) == 1))
 	{
-		if (map[coord.Y][coord.X]->mPiece == nullptr)
+		if (map[pos.Y][pos.X]->mPiece == nullptr)
 		{
+			for (int i = 0; i < 8; i++)
+			{
+				for (int j = 0; j < 8; j++)
+				{
+					if (map[i][j]->mPiece != nullptr && map[i][j]->mPiece->pieceColor != pieceColor && map[i][j]->mPiece->TryToKillPiece(map, pos))
+					{
+						return false;
+					}
+				}
+			}
+
+			WasMoved = true;
 			return true;
 		}
 	}

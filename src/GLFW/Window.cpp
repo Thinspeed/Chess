@@ -72,6 +72,7 @@ void Window::processKeyboardInput()
 {
 	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE))
 	{
+		game->FinishGame();
 		glfwSetWindowShouldClose(mWindow, true);
 	}
 }
@@ -163,37 +164,37 @@ GLuint loadTexture(std::string path)
  */
 void Window::loop()
 {
-	float green = 0;
-	float delta = 0.005;
 	GL::Program shader("defaultShader");
 	shader.bindAttribute(0, "position");
-	shader.bindAttribute(1, "color");
+	shader.bindAttribute(1, "textureCoords");
 	shader.link();
 	shader.use();
 
 	GetAllUniformLocation(&shader);
 	SetViewProjectionMatrix();
+	
 	stbi_set_flip_vertically_on_load(true);
 	glEnable(GL_DEPTH_TEST);
 	
 	glm::mat4 model = glm::mat4(1.0f);
 	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &model[0][0]);
 
-	while (!glfwWindowShouldClose(mWindow))
+	while (!glfwWindowShouldClose(mWindow) && !game->IsGameFinished)
 	{
-		//glClearColor(0.3, abs(sin(green)), 1, 1);
-		//green += 0.01;
 		if (game->myColor == Color::White)
 		{
 			glClearColor(1, 1, 1, 1);
 		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shader.use();
 		game->chessMap->Draw(ModelMatrixID);
 		glfwSwapBuffers(mWindow);
 		processKeyboardInput();
 		processMouseInput();
 		glfwPollEvents();
 	}
+
+	delete game;
 }
 
 Window::~Window()

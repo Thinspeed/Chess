@@ -16,14 +16,20 @@ private:
 	Piece* pieceToRemove = nullptr;
 	GLuint loadTexture(std::string path);
 	void arrangePieces();
-	bool tryToKillPiece(Point to);
 public:
+	Point WhiteKingPos;
+	Point BlackKingPos;
 	float cellWidth;
 	Piece* selectedPiece;
 	Map(float width);
 	void UnselectPiece();
 	void SelectePiece(Color myColor, Point coord);
 	bool TryToMovePiece(Point from, Point to);
+	bool TryCastle(Color color, Point pos);
+	bool IsCellUnderAttack(Point pos, Point from);
+	bool IsKingUnderAttack(Color color);
+	bool CanKillOrBlock(Color color, Point from);
+	bool IsCheckMate(Color color, Point from);
 	void Draw(GLuint modelMatrixID);
 	~Map();
 };

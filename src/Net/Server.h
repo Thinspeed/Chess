@@ -17,6 +17,7 @@ public:
 	void Listen();
 	bool sendData(int* buf, int length) override;
 	int* receiveData() override;
+	void closeConnection() override;
 	~Server();
 };
 
