@@ -17,7 +17,7 @@ void main()
 
 	vec3 norm = normalize(pass_normal);
 	vec3 lightDir = normalize(LightPos - fragPos); 
-	float diff = 1.0;
+	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * LightColor;
 
 	color = texture(TextureSampler, pass_textureCoords) * vec4(ambient + diffuse, 1.0f);

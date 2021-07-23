@@ -33,11 +33,13 @@ void GL::Model::addMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvCoordinates;
+	std::vector<glm::vec3> normals;
     std::vector<unsigned> indices;
 	
 	for (int i = 0; i < mesh->mNumVertices; i++)
 	{
         vertices.push_back(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+		normals.push_back(glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
 		if (mesh->mTextureCoords[0])
 		{
 			uvCoordinates.push_back(glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
@@ -60,6 +62,7 @@ void GL::Model::addMesh(aiMesh* mesh, const aiScene* scene)
 	VAO* vao = new VAO;
 	vao->addVertexBufferObject(vertices);
 	vao->addVertexBufferObject(uvCoordinates);
+	vao->addVertexBufferObject(normals);
 	vao->addIndices(indices);
 	vao->genNormals(vertices, indices);
 	meshes.push_back(vao);

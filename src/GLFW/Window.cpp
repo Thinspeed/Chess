@@ -129,15 +129,14 @@ void Window::SetViewProjectionMatrix()
 	Projection = glm::perspective(glm::radians(45.0f), windowWidth / (float)windowHeight, 0.1f, 100.0f);
 	glUniformMatrix4fv(ProjectionMatrixID, 1, GL_FALSE, &Projection[0][0]);
 	View = glm::lookAt(
-		glm::vec3(0, 0, 5), // координаты камеры
+		glm::vec3(0, 3, 5), // координаты камеры
 		glm::vec3(0, 0, 0), // направление камеры
 		glm::vec3(0, 1, 0)  // вектор, указывающий напрвление вверх
 	);
-
 	
 	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
-	glUniformMatrix3fv(LightPosID, 1, GL_FALSE, &View[0][0]);
-	glUniform3fv(LightPosID, 1, glm::value_ptr(View));
+	glm::vec3 lighPos = glm::vec3(0, 3, 5);
+	glUniform3fv(LightPosID, 1, &lighPos[0]);
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	glUniform3fv(LightColorID, 1, &lightColor[0]);
 }
