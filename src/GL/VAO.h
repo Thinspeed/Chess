@@ -22,6 +22,7 @@ namespace GL
 		void addVertexBufferObject(const std::vector<glm::vec3>& data);
 		void addVertexBufferObject(const std::vector<glm::vec4>& data);
 		void addIndices(const std::vector<unsigned>& data);
+		void genNormals(const std::vector<glm::vec3>& vertices, const std::vector<unsigned>& indices);
 		~VAO();
 	};
 }

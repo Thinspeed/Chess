@@ -82,6 +82,7 @@ void GL::VAO::addVertexBufferObject(const std::vector<glm::vec3>& data)
 	glVertexAttribPointer(mBuffers.size(), 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	mBuffers.push_back(vbo);
 }
+
 /**
  * \brief 4-компонентный массив
  * \param data
@@ -111,6 +112,22 @@ void GL::VAO::addIndices(const std::vector<unsigned>& data)
 	// обратите внимание, что мы используем не GL_ARRAY_BUFFER, а GL_ELEMENT_ARRAY_BUFFER
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndicesBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(unsigned), data.data(), GL_STATIC_DRAW);
+}
+
+void GL::VAO::genNormals(const std::vector<glm::vec3>& vertices, const std::vector<unsigned>& indices)
+{
+	std::vector<glm::vec3> normals;
+	for (int i = 0; i < indices.size() / 3; i++)
+	{
+		glm::vec3 first = vertices[indices[i * 3]];
+		glm::vec3 second = vertices[indices[(i * 3) + 1]];
+		glm::vec3 third = vertices[indices[(i * 3) + 2]];
+		normals.push_back(glm::cross(second - first, third - first));
+		normals.push_back(glm::cross(first - second, third - second));
+		normals.push_back(glm::cross(first - third, second - third));
+	}
+
+	addVertexBufferObject(normals);
 }
 
 GL::VAO::~VAO()

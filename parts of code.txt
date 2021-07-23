@@ -1,0 +1,30 @@
+	const std::vector<glm::vec3> vertices = {
+		{ 0, 0, 0 },
+		{ 0, 0, 1 },
+		{ 1, 0, 1 },
+		{ 1, 0, 0 },
+		{ 0, 1, 0 },
+		{ 0, 1, 1 },
+		{ 1, 1, 1 },
+		{ 1, 1, 0 }
+	};
+
+	const std::vector<unsigned> indices = { 0, 1, 2, 0, 2, 3, 0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2, 6, 7, 2, 7, 3, 3, 7, 4, 3, 4, 0, 4, 5, 6, 4, 6, 7 };
+	GL::VAO cube;
+	cube.addVertexBufferObject(vertices);
+
+	cube.addVertexBufferObject({
+		{ 0, 0 },
+		{ 0, 1 },
+		{ 1, 1 },
+		{ 1, 0 },
+		{ 0, 0 },
+		{ 0, 1 },
+		{ 1, 1 },
+		{ 1, 0 },
+	});
+	
+	cube.addIndices(indices);
+	cube.genNormals(vertices, indices);
+	GLuint texture = loadTexture("textures/uvtemplate.jpg");
+	glBindTexture(GL_TEXTURE_2D, texture);

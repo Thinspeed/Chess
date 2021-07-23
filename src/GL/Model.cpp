@@ -61,6 +61,7 @@ void GL::Model::addMesh(aiMesh* mesh, const aiScene* scene)
 	vao->addVertexBufferObject(vertices);
 	vao->addVertexBufferObject(uvCoordinates);
 	vao->addIndices(indices);
+	vao->genNormals(vertices, indices);
 	meshes.push_back(vao);
 }
 

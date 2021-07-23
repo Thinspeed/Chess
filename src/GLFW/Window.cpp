@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "Image/stb_image.h"
+#include "GL/Model.h"
 
 /**
  * \param title Заголовок окна
@@ -124,11 +125,11 @@ void Window::GetAllUniformLocation(GL::Program* program)
  */
 void Window::SetViewProjectionMatrix()
 {
-	Projection = glm::ortho(left, right, bottom, top, -50.0f, 50.0f);
-	//Projection = glm::perspective(glm::radians(45.0f), windowWidth / (float)windowHeight, 0.1f, 100.0f);
+	//Projection = glm::ortho(left, right, bottom, top, -50.0f, 50.0f);
+	Projection = glm::perspective(glm::radians(45.0f), windowWidth / (float)windowHeight, 0.1f, 100.0f);
 	glUniformMatrix4fv(ProjectionMatrixID, 1, GL_FALSE, &Projection[0][0]);
 	View = glm::lookAt(
-		glm::vec3(0, 0, 3), // координаты камеры
+		glm::vec3(0, 0, 5), // координаты камеры
 		glm::vec3(0, 0, 0), // направление камеры
 		glm::vec3(0, 1, 0)  // вектор, указывающий напрвление вверх
 	);
@@ -136,6 +137,7 @@ void Window::SetViewProjectionMatrix()
 	
 	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
 	glUniformMatrix3fv(LightPosID, 1, GL_FALSE, &View[0][0]);
+	glUniform3fv(LightPosID, 1, glm::value_ptr(View));
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	glUniform3fv(LightColorID, 1, &lightColor[0]);
 }
@@ -164,9 +166,11 @@ GLuint loadTexture(std::string path)
  */
 void Window::loop()
 {
-	GL::Program shader("defaultShader");
+	//GL::Program shader("defaultShader");
+	GL::Program shader("3dShader");
 	shader.bindAttribute(0, "position");
 	shader.bindAttribute(1, "textureCoords");
+	shader.bindAttribute(2, "normal");
 	shader.link();
 	shader.use();
 
@@ -178,19 +182,25 @@ void Window::loop()
 	
 	glm::mat4 model = glm::mat4(1.0f);
 	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &model[0][0]);
-
+	GLuint texture = loadTexture("textures/uvtemplate.jpg");
+	glBindTexture(GL_TEXTURE_2D, texture);
+	GL::Model pawn("textures/pawn.stl");
 	while (!glfwWindowShouldClose(mWindow) && !game->IsGameFinished)
 	{
 		if (game->myColor == Color::White)
 		{
 			glClearColor(1, 1, 1, 1);
 		}
+
+		glClearColor(0.5, 1, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shader.use();
-		game->chessMap->Draw(ModelMatrixID);
+		//game->chessMap->Draw(ModelMatrixID);
+		//cube.draw();
+		pawn.Draw();
 		glfwSwapBuffers(mWindow);
 		processKeyboardInput();
-		processMouseInput();
+		//processMouseInput();
 		glfwPollEvents();
 	}
 
