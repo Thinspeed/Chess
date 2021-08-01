@@ -24,7 +24,7 @@ private:
 	Game *game;
 	void processKeyboardInput();
 	void processMouseInput();
-	glm::vec3 translateToWorldCoord(double xpos, double ypos);
+	std::vector<glm::vec3> translateToWorldCoord(double xpos, double ypos);
 	void GetUniformsLocation(GL::Program *program);
 	void SetUniforms();
 public:

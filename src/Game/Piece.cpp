@@ -30,7 +30,7 @@ void Piece::Draw(GLuint modelMatrixID, float cellWidth)
 	}
 	else
 	{
-		modelMatrix = modelMatrix * glm::translate(glm::vec3(currentPos.X * cellWidth, 0, -((currentPos.Y + 0.25f) * cellWidth)));
+		modelMatrix = modelMatrix * glm::translate(glm::vec3(currentPos.X * cellWidth, 0.25f, -(currentPos.Y * cellWidth)));
 	}
 	
 	glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);

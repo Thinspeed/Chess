@@ -45,10 +45,25 @@ void Game::receiveGameInfo()
 	}
 }
 
-void Game::ProcessMapInput(float xPos, float yPos)
+void Game::ProcessMapInput(std::vector<glm::vec3> ray)
 {
-	int i = yPos / chessMap->cellWidth;
-	int j = xPos / chessMap->cellWidth;
+	if (ray.size() != 2)
+	{
+		throw std::runtime_error("Ray must have only two vectors");
+	}
+	
+	//mapHeight - координата Y верхней грани клеток, лучше высчитывать, но пока нет возможности
+	float mapHeight = 0;
+	float rate = 0;
+	if (ray[0].y != ray[1].y)
+	{
+		rate = (ray[0].y - mapHeight) / (ray[0].y - ray[1].y);
+	}
+
+	float zPos = abs(ray[0].z + ((ray[1].z - ray[0].z) * rate));
+	float xPos = ray[0].x + ((ray[1].x - ray[0].x) * rate);
+	int i = (zPos + chessMap->cellWidth / 2) / chessMap->cellWidth;
+	int j = (xPos + chessMap->cellWidth / 2) / chessMap->cellWidth;
 
 	if (i < 0 || i > 7 || j < 0 || j > 7)
 	{

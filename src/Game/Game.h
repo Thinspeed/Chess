@@ -28,7 +28,7 @@ public:
 	Map* chessMap;
 	Game();
 	Game(std::string ip);
-	void ProcessMapInput(float xPos, float yPos);
+	void ProcessMapInput(std::vector<glm::vec3> ray);
 	void FinishGame();
 	~Game();
 };

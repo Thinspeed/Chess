@@ -42,26 +42,30 @@ void Window::setContextCurrent()
 }
 
 /**
- * ѕереводит экранные координаты в мировые
+ * \brief ѕереводит экранные координаты в мировые, возвращает
+ * вектор, состо€щий из векторов, по нулевому индексу начальна€ координата луча,
+ * по первому - конечна€
  * \param xpos  оордината по оси Ox
  * \param ypos  оордината по оси Oy
  */
-glm::vec3 Window::translateToWorldCoord(double xpos, double ypos)
+std::vector<glm::vec3> Window::translateToWorldCoord(double xpos, double ypos)
 {
 	// перевод координат экрана в мировые координаты
 	glm::vec4 vEye(xpos / windowWidth * 2 - 1, 1 - ypos / windowHeight * 2, 0, 1);
-	glm::vec4 vDest(xpos / windowWidth * 2 - 1, 1 - ypos / windowHeight * 2, 0, 1);
+	glm::vec4 vDest(xpos / windowWidth * 2 - 1, 1 - ypos / windowHeight * 2, 1, 1);
 
 	glm::mat4 ViewProj = Projection * View;
 	ViewProj = glm::inverse(ViewProj);
 	vEye = ViewProj * vEye;
 	vDest = ViewProj * vDest;
 
-	// в данном случае координаты x и y совподают у rayStart и rayEnd, поэтому можно использоваь только один из них
 	glm::vec3 rayStart = glm::vec3(vEye.x, vEye.y, vEye.z) / vEye.w;
-	//glm::vec3 rayEnd = glm::vec3(vDest.x, vDest.y, vDest.z) / vDest.w;
+	glm::vec3 rayEnd = glm::vec3(vDest.x, vDest.y, vDest.z) / vDest.w;
 
-	return rayStart;
+	std::vector<glm::vec3> result;
+	result.push_back(rayStart);
+	result.push_back(rayEnd);
+	return result;
 }
 
 /**
@@ -95,10 +99,10 @@ void Window::processMouseInput()
 	double xpos;
 	double ypos;
 	glfwGetCursorPos(mWindow, &xpos, &ypos);
-	glm::vec3 coord = translateToWorldCoord(xpos, ypos);
+	std::vector<glm::vec3> ray = translateToWorldCoord(xpos, ypos);
 	if (game->IsMyTurn)
 	{
-		game->ProcessMapInput(coord.x, coord.y);
+		game->ProcessMapInput(ray);
 	}
 	
 	buttonPressed = false;
@@ -125,7 +129,7 @@ void Window::SetUniforms()
 	//Projection = glm::ortho(left, right, bottom, top, -50.0f, 50.0f);
 	Projection = glm::perspective(glm::radians(60.0f), windowWidth / (float)windowHeight, 0.1f, 100.0f);
 	glUniformMatrix4fv(ProjectionMatrixID, 1, GL_FALSE, &Projection[0][0]);
-	glm::vec3 viewPos = glm::vec3(2.1f, 3, 3);
+	glm::vec3 viewPos = glm::vec3(2.1f, 4, 1.5f);
 	glm::vec3 cameraDir = glm::vec3(2.1f, 0, -2.1);
 	View = glm::lookAt(
 		viewPos, // координаты камеры
@@ -193,7 +197,6 @@ void Window::loop()
 			glClearColor(1, 1, 1, 1);
 		}
 
-		glClearColor(0.5, 1, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shader.use();
 		game->chessMap->Draw(ModelMatrixID);
