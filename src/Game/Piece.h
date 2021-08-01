@@ -1,6 +1,7 @@
 #pragma once
 #include "GL/VAO.h"
 #include "glm/glm.hpp"
+#include "GL/Model.h"
 
 enum class Color
 {
@@ -41,7 +42,7 @@ class Cell;
 class Piece
 {
 protected:
-	GL::VAO vao_;
+	GL::Model *model_;
 public:
 	bool isSelected = false;
 	Color pieceColor;

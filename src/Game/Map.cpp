@@ -5,6 +5,7 @@
 #include "Officer.h"
 #include "Queen.h"
 #include "King.h"
+#include "GL/Model.h"
 #include "Image/stb_image.h"
 #include "GLFW/Window.h"
 #include "GLFW/texture.hpp"
@@ -12,10 +13,10 @@
 /**
  * \param width ширина одной клетки в мировых координатах
  */
-Map::Map(float width)
+Map::Map(float width, GL::Program* shader)
 {
 	cellWidth = width;
-	arrangePieces();
+	arrangePieces(shader);
 	WhiteKingPos = Point(3, 0);
 	BlackKingPos = Point(3, 7);
 	stbi_set_flip_vertically_on_load(false);
@@ -49,71 +50,107 @@ GLuint Map::loadTexture(std::string path)
 /**
  * \brief Создаёт фигуры и инициализурует их поля
  */
-void Map::arrangePieces()
+void Map::arrangePieces(GL::Program* shader)
 {
 	struct Point coord;
+	GL::Model *blackModel = new GL::Model("models/other_models/cell.obj", "textures/DarkWood", shader);
+	GL::Model *whiteModel = new GL::Model("models/other_models/cell.obj", "textures/LightWood", shader);
+	models.push_back(blackModel);
+	models.push_back(whiteModel);
 	for (int i = 0; i < mapW; i++)
 	{
 		for (int j = 0; j < mapW; j++)
-		{
+		{ 
 			coord.X = j;
 			coord.Y = i;
-			map[i][j] = new Cell(nullptr, j, i, cellWidth);
+			if ((i + j) % 2 == 0)
+			{
+				map[i][j] = new Cell(nullptr, j, i, cellWidth, blackModel);
+			}
+			else
+			{
+				map[i][j] = new Cell(nullptr, j, i, cellWidth, whiteModel);
+			}
 		}
 	}
-
+	
+	blackModel = new GL::Model("models/chess_models/pawn.obj", "textures/BlackMarble", shader);
+	whiteModel = new GL::Model("models/chess_models/pawn.obj", "textures/WhiteMarble", shader);
+	models.push_back(blackModel);
+	models.push_back(whiteModel);	
 	for (int i = 0; i < mapW; i++)
 	{
 		coord.X = i;
 		coord.Y = 1;
-		map[1][i]->mPiece = new Pawn(Color::White, coord, cellWidth);
+		map[1][i]->mPiece = new Pawn(Color::White, coord, cellWidth, whiteModel);
 
 		coord.X = i;
 		coord.Y = 6;
-		map[6][i]->mPiece = new Pawn(Color::Black, coord, cellWidth);
+		map[6][i]->mPiece = new Pawn(Color::Black, coord, cellWidth, blackModel);
 	}
 
+	blackModel = new GL::Model("models/chess_models/rook.obj", "textures/BlackMarble", shader);
+	whiteModel = new GL::Model("models/chess_models/rook.obj", "textures/WhiteMarble", shader);
+	models.push_back(blackModel);
+	models.push_back(whiteModel);
 	for (int i = 0; i < 2; i++)
 	{
 		coord.Y = i == 0 ? 0 : 7;
 		Color pColor = i == 0 ? Color::White : Color::Black;
+		GL::Model* model = i == 0 ? whiteModel : blackModel;
 		for (int j = 0; j < 2; j++)
 		{
 			coord.X = j == 0 ? 0 : 7;
-			map[coord.Y][coord.X]->mPiece = new Rook(pColor, coord, cellWidth);
+			map[coord.Y][coord.X]->mPiece = new Rook(pColor, coord, cellWidth, model);
 		}
 	}
 
+	blackModel = new GL::Model("models/chess_models/horse.obj", "textures/BlackMarble", shader);
+	whiteModel = new GL::Model("models/chess_models/horse.obj", "textures/WhiteMarble", shader);
+	models.push_back(blackModel);
+	models.push_back(whiteModel);
 	for (int i = 0; i < 2; i++)
 	{
 		coord.Y = i == 0 ? 0 : 7;
 		Color pColor = i == 0 ? Color::White : Color::Black;
+		GL::Model* model = i == 0 ? whiteModel : blackModel;
 		for (int j = 0; j < 2; j++)
 		{
 			coord.X = j == 0 ? 1 : 6;
-			map[coord.Y][coord.X]->mPiece = new Horse(pColor, coord, cellWidth);
+			map[coord.Y][coord.X]->mPiece = new Horse(pColor, coord, cellWidth, shader);
+			map[coord.Y][coord.X]->mPiece = new Horse(pColor, coord, cellWidth, model);
 		}
 	}
 
+	blackModel = new GL::Model("models/chess_models/bishop.obj", "textures/BlackMarble", shader);
+	whiteModel = new GL::Model("models/chess_models/bishop.obj", "textures/WhiteMarble", shader);
+	models.push_back(blackModel);
+	models.push_back(whiteModel);
 	for (int i = 0; i < 2; i++)
 	{
 		coord.Y = i == 0 ? 0 : 7;
 		Color pColor = i == 0 ? Color::White : Color::Black;
+		GL::Model* model = i == 0 ? whiteModel : blackModel;
 		for (int j = 0; j < 2; j++)
 		{
 			coord.X = j == 0 ? 2 : 5;
-			map[coord.Y][coord.X]->mPiece = new Officer(pColor, coord, cellWidth);
+			map[coord.Y][coord.X]->mPiece = new Officer(pColor, coord, cellWidth, shader);
+			map[coord.Y][coord.X]->mPiece = new Officer(pColor, coord, cellWidth, model);
 		}
 	}
 
-	for (int i = 0; i < 2; i++)
-	{
-		coord.X = 4; coord.Y = i == 0 ? 0 : 7;
-		Color pColor = i == 0 ? Color::White : Color::Black;
-		map[coord.Y][coord.X]->mPiece = new Queen(pColor, coord, cellWidth);
-		coord.X = 3;
-		map[coord.Y][coord.X]->mPiece = new King(pColor, coord, cellWidth);
-	}
+	blackModel = new GL::Model("models/chess_models/queen.obj", "textures/BlackMarble", shader);
+	whiteModel = new GL::Model("models/chess_models/queen.obj", "textures/WhiteMarble", shader);
+	models.push_back(blackModel);
+	models.push_back(whiteModel);
+	map[0][3]->mPiece = new Queen(Color::White, Point(3, 0), cellWidth, whiteModel);
+	map[7][3]->mPiece = new Queen(Color::Black, Point(3, 7), cellWidth, blackModel);
+	blackModel = new GL::Model("models/chess_models/king.obj", "textures/BlackMarble", shader);
+	whiteModel = new GL::Model("models/chess_models/king.obj", "textures/WhiteMarble", shader);
+	models.push_back(blackModel);
+	models.push_back(whiteModel);
+	map[0][4]->mPiece = new King(Color::White, Point(4, 0), cellWidth, whiteModel);
+	map[7][4]->mPiece = new King(Color::Black, Point(4, 7), cellWidth, blackModel);
 }
 
 /**
@@ -319,14 +356,14 @@ void Map::Draw(GLuint modelMatrixID)
 		{
 			if (i != coord.Y || j != coord.X)
 			{
-				map[i][j]->Draw(modelMatrixID, (i + j) % 2 == 0 ? whiteSquareTexture : blackSquareTexture, chessTexture);
+				map[i][j]->Draw(modelMatrixID);
 			}
 		}
 	}
 
 	if (selectedPiece)
 	{
-		map[coord.Y][coord.X]->Draw(modelMatrixID, (coord.Y + coord.X) % 2 == 0 ? whiteSquareTexture : blackSquareTexture, chessTexture);
+		map[coord.Y][coord.X]->Draw(modelMatrixID);
 	}
 }
 
@@ -371,5 +408,10 @@ Map::~Map()
 		{
 			delete(map[i][j]);
 		}
+	}
+
+	for (int i = 0; i < models.size(); i++)
+	{
+		delete(models[i]);
 	}
 }

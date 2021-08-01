@@ -1,26 +1,40 @@
 #include "Pawn.h"
 #include "GLFW/Window.h"
 
-Pawn::Pawn(const Color color, Point pos, float cellWidth)
+Pawn::Pawn(const Color color, Point pos, float cellWidth, GL::Program *shader)
 {
 	pieceColor = color;
 	currentPos = pos;
-	vao_.addVertexBufferObject({
-		{ 0, 0, -1 },
-		{ 0, cellWidth, -1 },
-		{ cellWidth, cellWidth, -1 },
-		{ cellWidth, 0, -1 },
-	});
-
-	vao_.addVertexBufferObject({
-		{ 0, (0.5f + (0.25f * (-(int)color + 1))) },
-		{ 0, (0.25f * (-(int)color + 1)) },
-		{ 1.0f / 6, (0.25f * (-(int)color + 1)) },
-		{ 1.0f / 6, (0.5f + (0.25f * (-(int)color + 1))) },
-	});
-	
-	vao_.addIndices({ 0, 1, 2, 0, 2, 3 });
 	isFirstStep = true;
+	std::string texturePath;
+	if (color == Color::White)
+	{
+		texturePath = "textures/WhiteMarble";
+	}
+	else
+	{
+		texturePath = "textures/BlackMarble";
+	}
+
+	model_ = new GL::Model("models/chess_models/pawn.obj", texturePath, shader);
+}
+
+Pawn::Pawn(const Color color, Point pos, float cellWidth, GL::Model *model)
+{
+	pieceColor = color;
+	currentPos = pos;
+	isFirstStep = true;
+	std::string texturePath;
+	if (color == Color::White)
+	{
+		texturePath = "textures/WhiteMarble";
+	}
+	else
+	{
+		texturePath = "textures/BlackMarble";
+	}
+
+	model_ = model;
 }
 
 bool Pawn::MakeMove(Cell* map[8][8], Point pos)

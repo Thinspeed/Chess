@@ -1,26 +1,30 @@
 #include "Rook.h"
 #include "GLFW/Window.h"
 
-Rook::Rook(const Color color, Point coord, float cellWidth)
+Rook::Rook(const Color color, Point coord, float cellWidth, GL::Program *shader)
 {
 	pieceColor = color;
 	currentPos = coord;
 	WasMoved = currentPos.X;
-	vao_.addVertexBufferObject({
-		{ 0, 0, -1 },
-		{ 0, cellWidth, -1 },
-		{ cellWidth, cellWidth, -1 },
-		{ cellWidth, 0, -1 },
-	});
+	std::string texturePath;
+	if (color == Color::White)
+	{
+		texturePath = "textures/WhiteMarble";
+	}
+	else
+	{
+		texturePath = "textures/BlackMarble";
+	}
 
-	vao_.addVertexBufferObject({
-		{ 1.0f / 6, (0.5f + (0.25f * (-(int)color + 1))) },
-		{ 1.0f / 6, (0.25f * (-(int)color + 1)) },
-		{ 2.0f / 6, (0.25f * (-(int)color + 1)) },
-		{ 2.0f / 6, (0.5f + (0.25f * (-(int)color + 1))) },
-	});
+	model_ = new GL::Model("models/chess_models/rook.obj", texturePath, shader);
+}
 
-	vao_.addIndices({ 0, 1, 2, 0, 2, 3 });
+Rook::Rook(const Color color, Point coord, float cellWidth, GL::Model *model)
+{
+	pieceColor = color;
+	currentPos = coord;
+	WasMoved = currentPos.X;
+	model_ = model;
 }
 
 bool Rook::MakeMove(Cell* map[8][8], Point coord)

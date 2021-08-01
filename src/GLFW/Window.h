@@ -25,14 +25,13 @@ private:
 	void processKeyboardInput();
 	void processMouseInput();
 	glm::vec3 translateToWorldCoord(double xpos, double ypos);
-	void GetAllUniformLocation(GL::Program *program);
-	void SetViewProjectionMatrix();
+	void GetUniformsLocation(GL::Program *program);
+	void SetUniforms();
 public:
 	GLuint ModelMatrixID;
 	GLuint ViewMatrixID;
 	GLuint ProjectionMatrixID;
-	GLuint LightPosID;
-	GLuint LightColorID;
+	GLuint ViewPosID;
 	Window(const std::string& title, int width, int height);
 	void setContextCurrent();
 	void loop();

@@ -1,6 +1,7 @@
 #pragma once
 #include "Piece.h"
 #include "GL/VAO.h"
+#include "GL/Program.h"
 #include <iostream>
 #include "Cell.h"
 
@@ -14,14 +15,15 @@ private:
 	GLuint blackSquareTexture;
 	GLuint chessTexture;
 	Piece* pieceToRemove = nullptr;
+	std::vector<GL::Model*> models;
 	GLuint loadTexture(std::string path);
-	void arrangePieces();
+	void arrangePieces(GL::Program* shader);
 public:
 	Point WhiteKingPos;
 	Point BlackKingPos;
 	float cellWidth;
 	Piece* selectedPiece;
-	Map(float width);
+	Map(float width, GL::Program *shader);
 	void UnselectPiece();
 	void SelectePiece(Color myColor, Point coord);
 	bool TryToMovePiece(Point from, Point to);

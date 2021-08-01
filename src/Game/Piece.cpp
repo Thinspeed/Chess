@@ -4,7 +4,6 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-
 bool Piece::MakeMove(Cell* map[8][8], Point pos)
 {
 	return false;
@@ -23,18 +22,18 @@ void Piece::Draw(GLuint modelMatrixID, float cellWidth)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glm::mat4 model;
-	model = glm::mat4(1.0f);
+	glm::mat4 modelMatrix;
+	modelMatrix = glm::mat4(1.0f);
 	if (!isSelected)
 	{
-		model = model * glm::translate(glm::vec3(currentPos.X * cellWidth, currentPos.Y * cellWidth, 0));
+		modelMatrix = modelMatrix * glm::translate(glm::vec3(currentPos.X * cellWidth, 0, -(currentPos.Y * cellWidth)));
 	}
 	else
 	{
-		model = model * glm::translate(glm::vec3(currentPos.X * cellWidth, (currentPos.Y + 0.25f) * cellWidth, 3.0f));
+		modelMatrix = modelMatrix * glm::translate(glm::vec3(currentPos.X * cellWidth, 0, -((currentPos.Y + 0.25f) * cellWidth)));
 	}
 	
-	glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &model[0][0]);
-	vao_.draw();
+	glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
+	model_->Draw();
 	glDisable(GL_BLEND);
 }

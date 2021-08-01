@@ -34,8 +34,6 @@ Window::Window(const std::string& title, int width, int height)
 	{
 		game = new Game(ip);
 	}
-
-	game->chessMap = new Map((top - bottom) / 8);
 }
 
 void Window::setContextCurrent()
@@ -111,34 +109,32 @@ void Window::processMouseInput()
  * \brief Получает ID всех юниформ из шейдара
  * \param program Указатель на шейдер
  */
-void Window::GetAllUniformLocation(GL::Program* program)
+void Window::GetUniformsLocation(GL::Program* program)
 {
 	ModelMatrixID = program->GetUinformLacation("ModelMatrix");
 	ViewMatrixID = program->GetUinformLacation("ViewMatrix");
 	ProjectionMatrixID = program->GetUinformLacation("ProjectionMatrix");
-	LightPosID = program->GetUinformLacation("LightPos");
-	LightColorID = program->GetUinformLacation("LightColor");
+	ViewPosID = program->GetUinformLacation("ViewPos");
 }
 
 /**
  * \brief Устанавливает стандартные значения для матриц вида и проекции
  */
-void Window::SetViewProjectionMatrix()
+void Window::SetUniforms()
 {
 	//Projection = glm::ortho(left, right, bottom, top, -50.0f, 50.0f);
-	Projection = glm::perspective(glm::radians(45.0f), windowWidth / (float)windowHeight, 0.1f, 100.0f);
+	Projection = glm::perspective(glm::radians(60.0f), windowWidth / (float)windowHeight, 0.1f, 100.0f);
 	glUniformMatrix4fv(ProjectionMatrixID, 1, GL_FALSE, &Projection[0][0]);
+	glm::vec3 viewPos = glm::vec3(2.1f, 3, 3);
+	glm::vec3 cameraDir = glm::vec3(2.1f, 0, -2.1);
 	View = glm::lookAt(
-		glm::vec3(0, 3, 5), // координаты камеры
-		glm::vec3(0, 0, 0), // направление камеры
+		viewPos, // координаты камеры
+		cameraDir, // направление камеры
 		glm::vec3(0, 1, 0)  // вектор, указывающий напрвление вверх
 	);
 	
 	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
-	glm::vec3 lighPos = glm::vec3(0, 3, 5);
-	glUniform3fv(LightPosID, 1, &lighPos[0]);
-	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	glUniform3fv(LightColorID, 1, &lightColor[0]);
+	glUniform3fv(ViewPosID, 1, &viewPos[0]);
 }
 
 GLuint loadTexture(std::string path)
@@ -172,18 +168,24 @@ void Window::loop()
 	shader.bindAttribute(2, "normal");
 	shader.link();
 	shader.use();
-
-	GetAllUniformLocation(&shader);
-	SetViewProjectionMatrix();
+	GetUniformsLocation(&shader);
+	SetUniforms();
+	glm::vec3 lightAmbient = glm::vec3(0.8f, 0.8f, 0.8f);
+	glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::vec3 lightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 lightDirection = glm::vec3(0, -1, -0);
+	glUniform3fv(shader.GetUinformLacation("LightProp.direction"), 1, &lightDirection[0]);
+	glUniform3fv(shader.GetUinformLacation("LightProp.ambient"), 1, &lightAmbient[0]);
+	glUniform3fv(shader.GetUinformLacation("LightProp.diffuse"), 1, &lightDiffuse[0]);
+	glUniform3fv(shader.GetUinformLacation("LightProp.specular"), 1, &lightSpecular[0]);
 	
 	stbi_set_flip_vertically_on_load(true);
 	glEnable(GL_DEPTH_TEST);
 	
 	glm::mat4 model = glm::mat4(1.0f);
 	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &model[0][0]);
-	GLuint texture = loadTexture("textures/uvtemplate.jpg");
-	glBindTexture(GL_TEXTURE_2D, texture);
-	GL::Model pawn("textures/pawn.stl");
+
+	game->chessMap = new Map(0.6f, &shader);
 	while (!glfwWindowShouldClose(mWindow) && !game->IsGameFinished)
 	{
 		if (game->myColor == Color::White)
@@ -194,12 +196,10 @@ void Window::loop()
 		glClearColor(0.5, 1, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shader.use();
-		//game->chessMap->Draw(ModelMatrixID);
-		//cube.draw();
-		pawn.Draw();
+		game->chessMap->Draw(ModelMatrixID);
 		glfwSwapBuffers(mWindow);
 		processKeyboardInput();
-		//processMouseInput();
+		processMouseInput();
 		glfwPollEvents();
 	}
 

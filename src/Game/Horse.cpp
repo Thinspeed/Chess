@@ -1,25 +1,38 @@
 #include "Horse.h"
 #include "GLFW/Window.h"
 
-Horse::Horse(const Color color, Point coord, float cellWidth)
+Horse::Horse(const Color color, Point coord, float cellWidth, GL::Program *shader)
 {
 	pieceColor = color;
 	currentPos = coord;
-	vao_.addVertexBufferObject({
-		{ 0, 0, -1 },
-		{ 0, cellWidth, -1 },
-		{ cellWidth, cellWidth, -1 },
-		{ cellWidth, 0, -1 },
-	});
+	std::string texturePath;
+	if (color == Color::White)
+	{
+		texturePath = "textures/WhiteMarble";
+	}
+	else
+	{
+		texturePath = "textures/BlackMarble";
+	}
 
-	vao_.addVertexBufferObject({
-		{ 2.0f / 6, (0.5f + (0.25f * (-(int)color + 1))) },
-		{ 2.0f / 6, (0.25f * (-(int)color + 1)) },
-		{ 3.0f / 6, (0.25f * (-(int)color + 1)) },
-		{ 3.0f / 6, (0.5f + (0.25f * (-(int)color + 1))) },
-	});
+	model_ = new GL::Model("models/chess_models/horse.obj", texturePath, shader);
+}
 
-	vao_.addIndices({ 0, 1, 2, 0, 2, 3 });
+Horse::Horse(const Color color, Point coord, float cellWidth, GL::Model *model)
+{
+	pieceColor = color;
+	currentPos = coord;
+	std::string texturePath;
+	if (color == Color::White)
+	{
+		texturePath = "textures/WhiteMarble";
+	}
+	else
+	{
+		texturePath = "textures/BlackMarble";
+	}
+
+	model_ = model;
 }
 
 bool Horse::MakeMove(Cell* map[8][8], Point coord)

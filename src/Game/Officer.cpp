@@ -1,25 +1,38 @@
 #include "Officer.h"
 #include "GLFW/Window.h"
 
-Officer::Officer(const Color color, Point coord, float cellWidth)
+Officer::Officer(const Color color, Point coord, float cellWidth, GL::Program *shader)
 {
 	pieceColor = color;
 	currentPos = coord;
-	vao_.addVertexBufferObject({
-		{ 0, 0, -1 },
-		{ 0, cellWidth, -1 },
-		{ cellWidth, cellWidth, -1 },
-		{ cellWidth, 0, -1 },
-	});
+	std::string texturePath;
+	if (color == Color::White)
+	{
+		texturePath = "textures/WhiteMarble";
+	}
+	else
+	{
+		texturePath = "textures/BlackMarble";
+	}
 
-	vao_.addVertexBufferObject({
-		{ 3.0f / 6, (0.5f + (0.25f * (-(int)color + 1))) },
-		{ 3.0f / 6, (0.25f * (-(int)color + 1)) },
-		{ 4.0f / 6, (0.25f * (-(int)color + 1)) },
-		{ 4.0f / 6, (0.5f + (0.25f * (-(int)color + 1))) },
-	});
+	model_ = new GL::Model("models/chess_models/bishop.obj", texturePath, shader);
+}
 
-	vao_.addIndices({ 0, 1, 2, 0, 2, 3 });
+Officer::Officer(const Color color, Point coord, float cellWidth, GL::Model *model)
+{
+	pieceColor = color;
+	currentPos = coord;
+	std::string texturePath;
+	if (color == Color::White)
+	{
+		texturePath = "textures/WhiteMarble";
+	}
+	else
+	{
+		texturePath = "textures/BlackMarble";
+	}
+
+	model_ = model;
 }
 
 bool Officer::MakeMove(Cell* map[8][8], Point coord)
