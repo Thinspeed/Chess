@@ -43,10 +43,7 @@ void Window::setContextCurrent()
 
 void Window::getWindowSize(int* width, int* height)
 {
-	int nLeft, nRight, nBottom, nTop;
-	glfwGetWindowFrameSize(mWindow, &nLeft, &nTop, &nRight, &nBottom);
-	*width = nRight - nLeft;
-	*height = nTop - nBottom;
+	glfwGetWindowSize(mWindow ,width, height);
 }
 
 /**
