@@ -41,6 +41,14 @@ void Window::setContextCurrent()
 	glfwMakeContextCurrent(mWindow);
 }
 
+void Window::getWindowSize(int* width, int* height)
+{
+	int nLeft, nRight, nBottom, nTop;
+	glfwGetWindowFrameSize(mWindow, &nLeft, &nTop, &nRight, &nBottom);
+	*width = nRight - nLeft;
+	*height = nTop - nBottom;
+}
+
 /**
  * \brief Переводит экранные координаты в мировые, возвращает
  * вектор, состоящий из векторов, по нулевому индексу начальная координата луча,
@@ -50,6 +58,8 @@ void Window::setContextCurrent()
  */
 std::vector<glm::vec3> Window::translateToWorldCoord(double xpos, double ypos)
 {
+	getWindowSize(&windowWidth, &windowHeight);
+	
 	// перевод координат экрана в мировые координаты
 	glm::vec4 vEye(xpos / windowWidth * 2 - 1, 1 - ypos / windowHeight * 2, 0, 1);
 	glm::vec4 vDest(xpos / windowWidth * 2 - 1, 1 - ypos / windowHeight * 2, 1, 1);
