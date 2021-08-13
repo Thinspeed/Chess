@@ -37,7 +37,7 @@ void Game::sendGameInfo()
 	//myColor = (Color)((rand() % 2 == 0) ? 1 : -1);
 	myColor = Color::Black;
 	IsMyTurn = (int)myColor + 1;
-	kingPos = Point(3, myColor == Color::White ? 0 : 7);
+	kingPos = Point(4, myColor == Color::White ? 0 : 7);
 	IsConnected = true;
 	std::cout << ((int)myColor == 1 ? "White" : "Black\n");
 	int buf[2] = { (int)Code::Color, (int)myColor * -1 };
@@ -51,7 +51,7 @@ void Game::receiveGameInfo()
 	{
 		myColor = (Color)buf[1];
 		IsMyTurn = (int)myColor + 1;
-		kingPos = Point(3, myColor == Color::White ? 0 : 7);
+		kingPos = Point(4, myColor == Color::White ? 0 : 7);
 		IsConnected = true;
 		std::cout << ((int)myColor == 1 ? "White" : "Black\n");
 	}
