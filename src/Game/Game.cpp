@@ -129,7 +129,8 @@ void Game::waitForMove()
 		}
 		else
 		{
-			throw std::runtime_error("Wrong code in data, code: " + buf[0]);
+			std::cout << "Wrong code in data, code: " << buf[0] << std::endl;
+			IsGameFinished = true;
 		}
 		
 		IsMyTurn = true;
