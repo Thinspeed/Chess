@@ -65,11 +65,11 @@ void Map::arrangePieces(GL::Program* shader)
 			coord.Y = i;
 			if ((i + j) % 2 == 0)
 			{
-				map[i][j] = new Cell(nullptr, j, i, cellWidth, whiteModel);
+				map[i][j] = new Cell(nullptr, j, i, cellWidth, blackModel);
 			}
 			else
 			{
-				map[i][j] = new Cell(nullptr, j, i, cellWidth, blackModel);
+				map[i][j] = new Cell(nullptr, j, i, cellWidth, whiteModel);
 			}
 		}
 	}

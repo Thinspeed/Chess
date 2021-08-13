@@ -53,7 +53,7 @@ void Game::ProcessMapInput(std::vector<glm::vec3> ray)
 	}
 	
 	//mapHeight - координата Y верхней грани клеток, лучше высчитывать, но пока нет возможности
-	float mapHeight = 0;
+	float mapHeight = -0.000261999987;
 	float rate = 0;
 	if (ray[0].y != ray[1].y)
 	{
