@@ -6,13 +6,29 @@
 Game::Game()
 {
 	net = (Net*)(new Server);
-	netThread = std::thread([this] { ((Server*)net)->Listen(); sendGameInfo(); waitForMove(); });
+	try
+	{
+		netThread = std::thread([this] { ((Server*)net)->Listen(); sendGameInfo(); waitForMove(); });
+	}
+	catch (std::runtime_error e)
+	{
+		std::cout << "Exception: " << e.what() << std::endl;
+		IsGameFinished = true;
+	}
 }
 
 Game::Game(std::string ip)
 {
 	net = (Net*)(new Client);
-	netThread = std::thread([this, ip] { ((Client*)net)->Connect(ip); receiveGameInfo(); waitForMove();  });
+	try
+	{
+		netThread = std::thread([this, ip] { ((Client*)net)->Connect(ip); receiveGameInfo(); waitForMove(); });
+	}
+	catch (std::runtime_error e)
+	{
+		std::cout << "Exception: " << e.what() << std::endl;
+		IsGameFinished = true;
+	}
 }
 
 void Game::sendGameInfo()
@@ -129,8 +145,7 @@ void Game::waitForMove()
 		}
 		else
 		{
-			std::cout << "Wrong code in data, code: " << buf[0] << std::endl;
-			IsGameFinished = true;
+			throw std::runtime_error("Wrong code in data, code: " + buf[0]);
 		}
 		
 		IsMyTurn = true;
@@ -141,9 +156,9 @@ void Game::waitForMove()
 
 void Game::FinishGame()
 {
+	IsGameFinished = true;
 	int* buf = (int*)malloc(sizeof(int));
 	buf[0] = (int)Code::EndOfGame;
-	IsGameFinished = true;
 	net->sendData(buf, 1);
 }
 
