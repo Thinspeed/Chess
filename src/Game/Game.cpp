@@ -10,7 +10,7 @@ Game::Game()
 	{
 		netThread = std::thread([this] { ((Server*)net)->Listen(); sendGameInfo(); waitForMove(); });
 	}
-	catch (std::runtime_error e)
+	catch (std::exception e)
 	{
 		std::cout << "Exception: " << e.what() << std::endl;
 		IsGameFinished = true;
