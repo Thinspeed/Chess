@@ -17,8 +17,8 @@ Map::Map(float width, GL::Program* shader)
 {
 	cellWidth = width;
 	arrangePieces(shader);
-	WhiteKingPos = Point(3, 0);
-	BlackKingPos = Point(3, 7);
+	WhiteKingPos = Point(4, 0);
+	BlackKingPos = Point(4, 7);
 	stbi_set_flip_vertically_on_load(false);
 	whiteSquareTexture = loadTexture("textures/whiteSquareTexture.jpg");
 	blackSquareTexture = loadTexture("textures/blackSquareTexture.jpg");
