@@ -4,6 +4,7 @@
 
 enum class Code
 {
+	BrokenConnection = -1,
 	Color = 0,
 	PieceMove = 1,
 	EndOfGame = 2,

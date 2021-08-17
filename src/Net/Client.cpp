@@ -74,7 +74,7 @@ int* Client::receiveData()
 		if (bytes == SOCKET_ERROR) {
 			closesocket(socket_);
 			int* temp = (int*)buf;
-			*temp = 2; *(temp + 1) = '\0';
+			*temp = SOCKET_ERROR; *(temp + 1) = '\0';
 		}
 		
 		a.unlock();

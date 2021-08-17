@@ -143,10 +143,15 @@ void Game::waitForMove()
 		{
 			IsGameFinished = true;
 		}
+		else if ((Code)buf[0] == Code::BrokenConnection)
+		{
+			std::cout << "Connection was broken.";
+			IsGameFinished = true;
+		}
 		else
 		{
 			throw std::runtime_error("Wrong code in data, code: " + buf[0]);
-			IsGameFinished = true;
+			//IsGameFinished = true;
 		}
 		
 		IsMyTurn = true;

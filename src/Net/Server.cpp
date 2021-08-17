@@ -100,7 +100,7 @@ int* Server::receiveData()
 	if (bytes == SOCKET_ERROR) {
 		closesocket(client);
 		int* temp = (int*)buf;
-		*temp = 2; *(temp + 1) = '\0';
+		*temp = SOCKET_ERROR; *(temp + 1) = '\0';
 	}
 	
 	return (int*)buf;
