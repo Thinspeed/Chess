@@ -99,7 +99,8 @@ int* Server::receiveData()
 	int bytes = recv(client, buf, max_client_buffer_size - 1, 0);
 	if (bytes == SOCKET_ERROR) {
 		closesocket(client);
-		buf[0] = 2; buf[2] = '\0';
+		int* temp = (int*)buf;
+		*temp = 2; *(temp + 1) = '\0';
 	}
 	
 	return (int*)buf;
