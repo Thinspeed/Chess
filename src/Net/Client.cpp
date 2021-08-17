@@ -73,8 +73,10 @@ int* Client::receiveData()
 		int bytes = recv(socket_, buf, max_client_buffer_size - 1, 0);
 		if (bytes == SOCKET_ERROR) {
 			closesocket(socket_);
-			throw std::runtime_error("receive failed: ");
+			int* temp = (int*)buf;
+			*temp = 2; *(temp + 1) = '\0';
 		}
+		
 		a.unlock();
 	}
 	catch (const std::exception& error)
