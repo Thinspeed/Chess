@@ -1,9 +1,12 @@
 #pragma once
 #include <map>
 #include <string>
-#include <glm/vec2.hpp>
-#include "Gl/Program.h"
+#include "GL/Program.h"
 #include <ft2build.h>
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include FT_FREETYPE_H
 
 struct TextChar {
@@ -13,19 +16,19 @@ struct TextChar {
 	unsigned int Advance; // смещение до следующего глифа
 };
 
-std::map<char, TextChar> chars;
-
 class Text
 {
 private:
-	void loadShader();
-public:
 	FT_Library ft;
 	FT_Face face;
-	GL::Program shader = GL::Program("textShader");
-	Text();
 	void LoadFont(std::string font);
+	void loadShader(std::string shaderPath, glm::mat4 projection);
 	void LoadCharacters();
+	std::map<char, TextChar> chars;
+	GL::Program *shader;
+public:
+	Text(std::string fontPath, std::string shaderPath, glm::mat4 projection);
+	void RenderText(std::string text, float x, float y, float scale, glm::vec3 color);
 	~Text();
 };
 
