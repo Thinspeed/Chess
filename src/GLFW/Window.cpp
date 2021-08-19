@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Image/stb_image.h"
 #include "GL/Model.h"
+#include "GLFW/Text.h"
 
 /**
  * \param title Заголовок окна
@@ -172,6 +173,9 @@ GLuint loadTexture(std::string path)
  */
 void Window::loop()
 {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//GL::Program shader("defaultShader");
 	GL::Program shader("3dShader");
 	shader.bindAttribute(0, "position");
@@ -191,11 +195,12 @@ void Window::loop()
 	glUniform3fv(shader.GetUinformLacation("LightProp.specular"), 1, &lightSpecular[0]);
 	
 	stbi_set_flip_vertically_on_load(true);
-	glEnable(GL_DEPTH_TEST);
 	
 	glm::mat4 model = glm::mat4(1.0f);
 	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &model[0][0]);
 
+	Text text("fonts/VERDANA.TTF", "textShader", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f, -50.0f, 50.0f));
+	
 	game->chessMap = new Map(0.6f, &shader);
 	while (!glfwWindowShouldClose(mWindow) && !game->IsGameFinished)
 	{
@@ -204,9 +209,10 @@ void Window::loop()
 			glClearColor(1, 1, 1, 1);
 		}
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shader.use();
 		game->chessMap->Draw(ModelMatrixID);
+		text.RenderText("hello, gay", 2, 2, 0.05f, glm::vec3(1.0f, 0.0f, 1.0f));
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwSwapBuffers(mWindow);
 		processKeyboardInput();
 		processMouseInput();

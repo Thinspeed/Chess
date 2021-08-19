@@ -20,8 +20,6 @@ bool Piece::TryToKillPiece(Cell* map[8][8], Point pos)
 
 void Piece::Draw(GLuint modelMatrixID, float cellWidth)
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glm::mat4 modelMatrix;
 	modelMatrix = glm::mat4(1.0f);
 	if (!isSelected)
@@ -35,5 +33,4 @@ void Piece::Draw(GLuint modelMatrixID, float cellWidth)
 	
 	glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, &modelMatrix[0][0]);
 	model_->Draw();
-	glDisable(GL_BLEND);
 }

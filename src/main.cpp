@@ -14,8 +14,6 @@ int main()
 {
 	try
 	{
-		//виртуалка - 192.168.1.75
-		//192.168.1.130
 		stbi_set_flip_vertically_on_load(true);
 		GLFW glfw;
 		Window gameWindow("Online Chess", ScreenWidth, ScreenHeight);
