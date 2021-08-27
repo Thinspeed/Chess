@@ -3,8 +3,9 @@
 #include "Net/Client.h"
 #include <thread>
 
-Game::Game()
+Game::Game(GL::Program* shader, Text* textPrinter) : Scene(shader, textPrinter)
 {
+	chessMap = new Map(0.6f, shader);
 	net = (Net*)(new Server);
 	try
 	{
@@ -17,8 +18,9 @@ Game::Game()
 	}
 }
 
-Game::Game(std::string ip)
+Game::Game(std::string ip, GL::Program* shader, Text* textPrinter) : Scene(shader, textPrinter)
 {
+	chessMap = new Map(0.6f, shader);
 	net = (Net*)(new Client);
 	try
 	{
@@ -61,8 +63,21 @@ void Game::receiveGameInfo()
 	}
 }
 
-void Game::ProcessMapInput(std::vector<glm::vec3> ray)
+void Game::ProcessKeyboardInput(int key)
 {
+	if (key == GLFW_KEY_ESCAPE)
+	{
+		FinishGame();
+	}
+}
+
+void Game::ProcessMouseInput(std::vector<glm::vec3> ray)
+{
+	if (!IsMyTurn)
+	{
+		return;
+	}
+	
 	if (ray.size() != 2)
 	{
 		throw std::runtime_error("Ray must have only two vectors");
@@ -166,6 +181,17 @@ void Game::FinishGame()
 	int* buf = (int*)malloc(sizeof(int));
 	buf[0] = (int)Code::EndOfGame;
 	net->sendData(buf, 1);
+	IsSceneFinished = true;
+}
+
+void Game::Draw(GLuint ModelMatrixID)
+{
+	if (myColor == Color::White)
+	{
+		glClearColor(1, 1, 1, 1);
+	}
+	
+	chessMap->Draw(ModelMatrixID);
 }
 
 Game::~Game()

@@ -1,5 +1,6 @@
 #pragma once
 #include "Map.h"
+#include "GL/Scene.h"
 #include "Net/Net.h"
 
 enum class Code
@@ -11,6 +12,7 @@ enum class Code
 };
 
 class Game
+	: public Scene
 {
 private:
 	std::thread netThread;
@@ -27,10 +29,12 @@ public:
 	bool IsMyTurn = false;
 	bool IsGameFinished = false;
 	Map* chessMap;
-	Game();
-	Game(std::string ip);
-	void ProcessMapInput(std::vector<glm::vec3> ray);
+	Game(GL::Program* shader, Text* textPrinter);
+	Game(std::string ip, GL::Program* shader, Text* textPrinter);
+	void ProcessKeyboardInput(int key) override;
+	void ProcessMouseInput(std::vector<glm::vec3> ray) override;
 	void FinishGame();
+	void Draw(GLuint ModelMatrixID) override;
 	~Game();
 };
 
