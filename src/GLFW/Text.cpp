@@ -138,6 +138,5 @@ void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3
 Text::~Text()
 {
 	FT_Done_Face(face);
-	//FT_Done_FreeType(ft);
 	delete(shader);
 }
