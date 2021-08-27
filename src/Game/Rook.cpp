@@ -15,8 +15,6 @@ Rook::Rook(const Color color, Point coord, float cellWidth, GL::Program *shader)
 	{
 		texturePath = "textures/BlackMarble";
 	}
-
-	model_ = new GL::Model("models/chess_models/rook.obj", texturePath, shader);
 }
 
 Rook::Rook(const Color color, Point coord, float cellWidth, GL::Model *model)

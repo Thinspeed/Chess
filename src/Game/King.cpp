@@ -15,8 +15,6 @@ King::King(const Color color, Point pos, float cellWidth, GL::Program *shader)
 	{
 		texturePath = "textures/BlackMarble";
 	}
-
-	model_ = new GL::Model("models/chess_models/king.obj", texturePath, shader);
 }
 
 King::King(const Color color, Point pos, float cellWidth, GL::Model *model)

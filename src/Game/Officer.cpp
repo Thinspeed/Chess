@@ -14,8 +14,6 @@ Officer::Officer(const Color color, Point coord, float cellWidth, GL::Program *s
 	{
 		texturePath = "textures/BlackMarble";
 	}
-
-	model_ = new GL::Model("models/chess_models/bishop.obj", texturePath, shader);
 }
 
 Officer::Officer(const Color color, Point coord, float cellWidth, GL::Model *model)

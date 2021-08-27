@@ -13,8 +13,7 @@ Cell::Cell(Piece* piece, int x, int y, float cellWidth, GL::Program *shader)
 	{
 		texturePath = "textures/LightWood";
 	}
-	
-	model_ = new GL::Model("models/other_models/cell.obj", texturePath, shader);
+
 	modelMatrix = glm::mat4(1.0f) * glm::translate(glm::vec3(x * width, 0, -(y * width)));
 }
 

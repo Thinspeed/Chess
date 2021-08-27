@@ -14,8 +14,6 @@ Horse::Horse(const Color color, Point coord, float cellWidth, GL::Program *shade
 	{
 		texturePath = "textures/BlackMarble";
 	}
-
-	model_ = new GL::Model("models/chess_models/horse.obj", texturePath, shader);
 }
 
 Horse::Horse(const Color color, Point coord, float cellWidth, GL::Model *model)

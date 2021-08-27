@@ -14,8 +14,6 @@ Queen::Queen(const Color color, Point coord, float cellWidth, GL::Program *shade
 	{
 		texturePath = "textures/BlackMarble";
 	}
-
-	model_ = new GL::Model("models/chess_models/queen.obj", texturePath, shader);
 }
 
 Queen::Queen(const Color color, Point coord, float cellWidth, GL::Model *model)
