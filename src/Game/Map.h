@@ -4,6 +4,7 @@
 #include "GL/Program.h"
 #include <iostream>
 #include "Cell.h"
+#include "GL/Texture.h"
 
 #define mapW 8
 
@@ -11,12 +12,17 @@ class Map
 {
 private:
 	Cell* map[mapW][mapW];
-	GLuint whiteSquareTexture;
-	GLuint blackSquareTexture;
-	GLuint chessTexture;
 	Piece* pieceToRemove = nullptr;
 	std::vector<GL::Model*> models;
-	GLuint loadTexture(std::string path);
+	GL::Texture* whiteMarbleDiffuse;
+	GL::Texture* whiteMarbleSpecular;
+	GL::Texture* blackMarbleDiffuse;
+	GL::Texture* blackMarbleSpecular;
+	GL::Texture* lightWoodDiffuse;
+	GL::Texture* lightWoodSpecular;
+	GL::Texture* darkWoodDiffuse;
+	GL::Texture* darkWoodSpecular;
+	void loadTextures();
 	void arrangePieces(GL::Program* shader);
 public:
 	Point WhiteKingPos;

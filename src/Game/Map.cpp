@@ -19,32 +19,6 @@ Map::Map(float width, GL::Program* shader)
 	arrangePieces(shader);
 	WhiteKingPos = Point(4, 0);
 	BlackKingPos = Point(4, 7);
-	stbi_set_flip_vertically_on_load(false);
-	whiteSquareTexture = loadTexture("textures/whiteSquareTexture.jpg");
-	blackSquareTexture = loadTexture("textures/blackSquareTexture.jpg");
-	chessTexture	   = texture_loadDDS("textures/chess.dds");
-}
-
-/**
- * \brief Загрузить текстуру
- * \param path Путь к файлу
- */
-GLuint Map::loadTexture(std::string path)
-{
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-	if (data == nullptr)
-	{
-		throw std::runtime_error("Could not load texture: " + path);
-	}
-
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	return texture;
 }
 
 /**
@@ -52,9 +26,10 @@ GLuint Map::loadTexture(std::string path)
  */
 void Map::arrangePieces(GL::Program* shader)
 {
+	loadTextures();
 	struct Point coord;
-	GL::Model *blackModel = new GL::Model("models/other_models/cell.obj", "textures/DarkWood", shader);
-	GL::Model *whiteModel = new GL::Model("models/other_models/cell.obj", "textures/LightWood", shader);
+	GL::Model *blackModel = new GL::Model("models/other_models/cell.obj", darkWoodDiffuse, darkWoodSpecular, shader);
+	GL::Model *whiteModel = new GL::Model("models/other_models/cell.obj", lightWoodDiffuse, lightWoodSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
 	for (int i = 0; i < mapW; i++)
@@ -73,11 +48,11 @@ void Map::arrangePieces(GL::Program* shader)
 			}
 		}
 	}
-	
-	blackModel = new GL::Model("models/chess_models/pawn.obj", "textures/BlackMarble", shader);
-	whiteModel = new GL::Model("models/chess_models/pawn.obj", "textures/WhiteMarble", shader);
+
+	blackModel = new GL::Model("models/chess_models/Pawn.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
+	whiteModel = new GL::Model("models/chess_models/Pawn.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
-	models.push_back(whiteModel);	
+	models.push_back(whiteModel);
 	for (int i = 0; i < mapW; i++)
 	{
 		coord.X = i;
@@ -88,69 +63,48 @@ void Map::arrangePieces(GL::Program* shader)
 		coord.Y = 6;
 		map[6][i]->mPiece = new Pawn(Color::Black, coord, cellWidth, blackModel);
 	}
-
-	blackModel = new GL::Model("models/chess_models/rook.obj", "textures/BlackMarble", shader);
-	whiteModel = new GL::Model("models/chess_models/rook.obj", "textures/WhiteMarble", shader);
+	
+	blackModel = new GL::Model("models/chess_models/Rook.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
+	whiteModel = new GL::Model("models/chess_models/Rook.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	for (int i = 0; i < 2; i++)
-	{
-		coord.Y = i == 0 ? 0 : 7;
-		Color pColor = i == 0 ? Color::White : Color::Black;
-		GL::Model* model = i == 0 ? whiteModel : blackModel;
-		for (int j = 0; j < 2; j++)
-		{
-			coord.X = j == 0 ? 0 : 7;
-			map[coord.Y][coord.X]->mPiece = new Rook(pColor, coord, cellWidth, model);
-		}
-	}
-
-	blackModel = new GL::Model("models/chess_models/horse.obj", "textures/BlackMarble", shader);
-	whiteModel = new GL::Model("models/chess_models/horse.obj", "textures/WhiteMarble", shader);
+	map[0][0]->mPiece = new Rook(Color::White, Point(0, 0), cellWidth, whiteModel);
+	map[0][7]->mPiece = new Rook(Color::White, Point(7, 0), cellWidth, whiteModel);
+	map[7][0]->mPiece = new Rook(Color::Black, Point(0, 7), cellWidth, blackModel);
+	map[7][7]->mPiece = new Rook(Color::Black, Point(7, 7), cellWidth, blackModel);
+	
+	blackModel = new GL::Model("models/chess_models/Horse.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
+	whiteModel = new GL::Model("models/chess_models/Horse.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	for (int i = 0; i < 2; i++)
-	{
-		coord.Y = i == 0 ? 0 : 7;
-		Color pColor = i == 0 ? Color::White : Color::Black;
-		GL::Model* model = i == 0 ? whiteModel : blackModel;
-		for (int j = 0; j < 2; j++)
-		{
-			coord.X = j == 0 ? 1 : 6;
-			map[coord.Y][coord.X]->mPiece = new Horse(pColor, coord, cellWidth, shader);
-			map[coord.Y][coord.X]->mPiece = new Horse(pColor, coord, cellWidth, model);
-		}
-	}
-
-	blackModel = new GL::Model("models/chess_models/bishop.obj", "textures/BlackMarble", shader);
-	whiteModel = new GL::Model("models/chess_models/bishop.obj", "textures/WhiteMarble", shader);
+	map[0][1]->mPiece = new Rook(Color::White, Point(1, 0), cellWidth, whiteModel);
+	map[0][6]->mPiece = new Rook(Color::White, Point(6, 0), cellWidth, whiteModel);
+	map[7][1]->mPiece = new Rook(Color::Black, Point(1, 7), cellWidth, blackModel);
+	map[7][6]->mPiece = new Rook(Color::Black, Point(6, 7), cellWidth, blackModel);
+	
+	blackModel = new GL::Model("models/chess_models/Bishop.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
+	whiteModel = new GL::Model("models/chess_models/Bishop.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	for (int i = 0; i < 2; i++)
-	{
-		coord.Y = i == 0 ? 0 : 7;
-		Color pColor = i == 0 ? Color::White : Color::Black;
-		GL::Model* model = i == 0 ? whiteModel : blackModel;
-		for (int j = 0; j < 2; j++)
-		{
-			coord.X = j == 0 ? 2 : 5;
-			map[coord.Y][coord.X]->mPiece = new Officer(pColor, coord, cellWidth, shader);
-			map[coord.Y][coord.X]->mPiece = new Officer(pColor, coord, cellWidth, model);
-		}
-	}
-
-	blackModel = new GL::Model("models/chess_models/queen.obj", "textures/BlackMarble", shader);
-	whiteModel = new GL::Model("models/chess_models/queen.obj", "textures/WhiteMarble", shader);
+	map[0][2]->mPiece = new Rook(Color::White, Point(2, 0), cellWidth, whiteModel);
+	map[0][5]->mPiece = new Rook(Color::White, Point(5, 0), cellWidth, whiteModel);
+	map[7][2]->mPiece = new Rook(Color::Black, Point(2, 7), cellWidth, blackModel);
+	map[7][5]->mPiece = new Rook(Color::Black, Point(5, 7), cellWidth, blackModel);
+	
+	blackModel = new GL::Model("models/chess_models/Queen.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
+	whiteModel = new GL::Model("models/chess_models/Queen.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	map[0][3]->mPiece = new Queen(Color::White, Point(3, 0), cellWidth, whiteModel);
-	map[7][3]->mPiece = new Queen(Color::Black, Point(3, 7), cellWidth, blackModel);
-	blackModel = new GL::Model("models/chess_models/king.obj", "textures/BlackMarble", shader);
-	whiteModel = new GL::Model("models/chess_models/king.obj", "textures/WhiteMarble", shader);
+	map[0][3]->mPiece = new Rook(Color::White, Point(3, 0), cellWidth, whiteModel);
+	map[7][3]->mPiece = new Rook(Color::Black, Point(3, 7), cellWidth, blackModel);
+	
+	blackModel = new GL::Model("models/chess_models/King.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
+	whiteModel = new GL::Model("models/chess_models/King.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	map[0][4]->mPiece = new King(Color::White, Point(4, 0), cellWidth, whiteModel);
-	map[7][4]->mPiece = new King(Color::Black, Point(4, 7), cellWidth, blackModel);
+	map[0][4]->mPiece = new Rook(Color::White, Point(4, 0), cellWidth, whiteModel);
+	map[7][4]->mPiece = new Rook(Color::Black, Point(4, 7), cellWidth, blackModel);
+	
 }
 
 /**
@@ -400,6 +354,21 @@ void Map::SelectePiece(Color myColor, Point coord)
 	}
 }
 
+/**
+ * \brief Загружает текстуры необходимые для отрисовки карты
+ */
+void Map::loadTextures()
+{
+	whiteMarbleDiffuse = new GL::Texture("textures/WhiteMarble/diffuse.jpg");
+	whiteMarbleSpecular = new GL::Texture("textures/WhiteMarble/specular.jpg");
+	blackMarbleDiffuse = new GL::Texture("textures/BlackMarble/diffuse.jpg");
+	blackMarbleSpecular = new GL::Texture("textures/BlackMarble/specular.jpg");
+	lightWoodDiffuse = new GL::Texture("textures/LightWood/diffuse.jpg");
+	lightWoodSpecular = new GL::Texture("textures/LightWood/specular.jpg");
+	darkWoodDiffuse = new GL::Texture("textures/DarkWood/diffuse.jpg");
+	darkWoodSpecular = new GL::Texture("textures/DarkWood/specular.jpg");
+}
+
 Map::~Map()
 {
 	for (int i = 0; i < mapW; i++)
@@ -414,4 +383,13 @@ Map::~Map()
 	{
 		delete(models[i]);
 	}
+
+	delete(whiteMarbleDiffuse);
+	delete(whiteMarbleSpecular);
+	delete(blackMarbleDiffuse);
+	delete(blackMarbleSpecular);
+	delete(lightWoodDiffuse);
+	delete(lightWoodSpecular);
+	delete(darkWoodDiffuse);
+	delete(darkWoodSpecular);
 }
