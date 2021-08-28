@@ -25,6 +25,5 @@ int main()
 		Sleep(3000);
 	}
 
-	_getch();
 	return 0;
 }
