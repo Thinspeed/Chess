@@ -2,6 +2,7 @@
 #include "gl.h"
 #include "GL/Program.h"
 #include "Game/Map.h"
+#include "GL/Scene.h"
 #include "Game/Game.h"
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,22 +20,16 @@ private:
 	int windowHeight;
 	bool buttonPressed = false;
 	GLFWwindow* mWindow;
-	glm::mat4 View;
-	glm::mat4 Projection;
-	Game *game;
+	Scene *scene;
 	void processKeyboardInput();
 	void processMouseInput();
 	void getWindowSize(int* width, int* height);
 	std::vector<glm::vec3> translateToWorldCoord(double xpos, double ypos);
-	void GetUniformsLocation(GL::Program *program);
-	void SetUniforms();
+	void switchScene();
 public:
-	GLuint ModelMatrixID;
-	GLuint ViewMatrixID;
-	GLuint ProjectionMatrixID;
-	GLuint ViewPosID;
 	Window(const std::string& title, int width, int height);
 	void setContextCurrent();
+	void static key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void loop();
 	~Window();
 };

@@ -1,7 +1,11 @@
 #include "Window.h"
+#include "Game/MainMenu.h"
+#include "Game/EnterIPScene.h"
 #include "Image/stb_image.h"
 #include "GL/Model.h"
 #include "GLFW/Text.h"
+
+int lastPressedButton = -1;
 
 /**
  * \param title Заголовок окна
@@ -25,16 +29,8 @@ Window::Window(const std::string& title, int width, int height)
 
 	windowWidth = width;
 	windowHeight = height;
-	std::string ip;
-	std::cin >> ip;
-	if (ip.length() == 1)
-	{
-		game = new Game();
-	}
-	else
-	{
-		game = new Game(ip);
-	}
+
+	stbi_set_flip_vertically_on_load(false);
 }
 
 void Window::setContextCurrent()
@@ -62,7 +58,7 @@ std::vector<glm::vec3> Window::translateToWorldCoord(double xpos, double ypos)
 	glm::vec4 vEye(xpos / windowWidth * 2 - 1, 1 - ypos / windowHeight * 2, 0, 1);
 	glm::vec4 vDest(xpos / windowWidth * 2 - 1, 1 - ypos / windowHeight * 2, 1, 1);
 
-	glm::mat4 ViewProj = Projection * View;
+	glm::mat4 ViewProj = scene->Projection * scene->View;
 	ViewProj = glm::inverse(ViewProj);
 	vEye = ViewProj * vEye;
 	vDest = ViewProj * vDest;
@@ -76,16 +72,28 @@ std::vector<glm::vec3> Window::translateToWorldCoord(double xpos, double ypos)
 	return result;
 }
 
+void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_RELEASE)
+	{
+		return;
+	}
+	
+	lastPressedButton = key;
+}
+
 /**
  * \brief Обрабатывает нажатите клавиш клавиатуры
  */
 void Window::processKeyboardInput()
 {
-	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE))
+	if (lastPressedButton == -1)
 	{
-		game->FinishGame();
-		glfwSetWindowShouldClose(mWindow, true);
+		return;
 	}
+
+	scene->ProcessKeyboardInput(lastPressedButton);
+	lastPressedButton = -1;
 }
 
 /**
@@ -108,45 +116,8 @@ void Window::processMouseInput()
 	double ypos;
 	glfwGetCursorPos(mWindow, &xpos, &ypos);
 	std::vector<glm::vec3> ray = translateToWorldCoord(xpos, ypos);
-	if (game->IsMyTurn)
-	{
-		game->ProcessMapInput(ray);
-	}
-	
+	scene->ProcessMouseInput(ray);
 	buttonPressed = false;
-}
-
-
-/**
- * \brief Получает ID всех юниформ из шейдара
- * \param program Указатель на шейдер
- */
-void Window::GetUniformsLocation(GL::Program* program)
-{
-	ModelMatrixID = program->GetUinformLacation("ModelMatrix");
-	ViewMatrixID = program->GetUinformLacation("ViewMatrix");
-	ProjectionMatrixID = program->GetUinformLacation("ProjectionMatrix");
-	ViewPosID = program->GetUinformLacation("ViewPos");
-}
-
-/**
- * \brief Устанавливает стандартные значения для матриц вида и проекции
- */
-void Window::SetUniforms()
-{
-	//Projection = glm::ortho(left, right, bottom, top, -50.0f, 50.0f);
-	Projection = glm::perspective(glm::radians(60.0f), windowWidth / (float)windowHeight, 0.1f, 100.0f);
-	glUniformMatrix4fv(ProjectionMatrixID, 1, GL_FALSE, &Projection[0][0]);
-	glm::vec3 viewPos = glm::vec3(2.1f, 4, 1.5f);
-	glm::vec3 cameraDir = glm::vec3(2.1f, 0, -2.1);
-	View = glm::lookAt(
-		viewPos, // координаты камеры
-		cameraDir, // направление камеры
-		glm::vec3(0, 1, 0)  // вектор, указывающий напрвление вверх
-	);
-	
-	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
-	glUniform3fv(ViewPosID, 1, &viewPos[0]);
 }
 
 GLuint loadTexture(std::string path)
@@ -167,6 +138,15 @@ GLuint loadTexture(std::string path)
 	return texture;
 }
 
+void Window::switchScene()
+{
+	if (scene->IsSceneFinished && scene->NextScene != nullptr)
+	{
+		Scene* lastScene = scene;
+		scene = scene->NextScene;
+		delete(lastScene);
+	}
+}
 
 /**
  * \brief Главный цикл программы
@@ -176,15 +156,12 @@ void Window::loop()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//GL::Program shader("defaultShader");
 	GL::Program shader("3dShader");
 	shader.bindAttribute(0, "position");
 	shader.bindAttribute(1, "textureCoords");
 	shader.bindAttribute(2, "normal");
 	shader.link();
 	shader.use();
-	GetUniformsLocation(&shader);
-	SetUniforms();
 	glm::vec3 lightAmbient = glm::vec3(0.8f, 0.8f, 0.8f);
 	glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	glm::vec3 lightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -195,31 +172,39 @@ void Window::loop()
 	glUniform3fv(shader.GetUinformLacation("LightProp.specular"), 1, &lightSpecular[0]);
 	
 	stbi_set_flip_vertically_on_load(true);
-	
-	glm::mat4 model = glm::mat4(1.0f);
-	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &model[0][0]);
 
 	Text text("fonts/VERDANA.TTF", "textShader", glm::ortho(0.0f, 16.0f, 0.0f, 9.0f, -50.0f, 50.0f));
-	
-	game->chessMap = new Map(0.6f, &shader);
-	while (!glfwWindowShouldClose(mWindow) && !game->IsGameFinished)
-	{
-		if (game->myColor == Color::White)
-		{
-			glClearColor(1, 1, 1, 1);
-		}
+	//std::string ip;
+	//std::cin >> ip;
+	//if (ip.length() == 1)
+	//{
+	//	scene = new Game(&shader, &text, windowWidth, windowHeight);
+	//}
+	//else
+	//{
+	//	scene = new Game(ip, &shader, &text, windowWidth, windowHeight);
+	//}
 
-		shader.use();
-		game->chessMap->Draw(ModelMatrixID);
-		text.RenderText("hello, gay", 2, 2, 0.05f, glm::vec3(1.0f, 0.0f, 1.0f));
+	glfwSetKeyCallback(mWindow, key_callback);
+	scene = new MainMenu(&shader, &text, windowWidth, windowHeight);
+	while (!glfwWindowShouldClose(mWindow) && !scene->IsSceneFinished)
+	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shader.use();
+		scene->Draw();
+		//text.RenderText("hello", 2, 2, 0.05f, glm::vec3(1.0f, 0.0f, 1.0f));
 		glfwSwapBuffers(mWindow);
 		processKeyboardInput();
 		processMouseInput();
 		glfwPollEvents();
+
+		if (scene->IsSceneFinished)
+		{
+			switchScene();
+		}
 	}
 
-	delete game;
+	delete scene;
 }
 
 Window::~Window()
