@@ -3,7 +3,7 @@
 #include "Net/Client.h"
 #include <thread>
 
-Game::Game(GL::Program* shader, Text* textPrinter) : Scene(shader, textPrinter)
+Game::Game(GL::Program* shader, Text* textPrinter, int windowWidth, int windowHeight) : Scene(shader, textPrinter, windowWidth, windowHeight)
 {
 	chessMap = new Map(0.6f, shader);
 	net = (Net*)(new Server);
@@ -18,7 +18,7 @@ Game::Game(GL::Program* shader, Text* textPrinter) : Scene(shader, textPrinter)
 	}
 }
 
-Game::Game(std::string ip, GL::Program* shader, Text* textPrinter) : Scene(shader, textPrinter)
+Game::Game(std::string ip, GL::Program* shader, Text* textPrinter, int windowWidth, int windowHeight) : Scene(shader, textPrinter, windowWidth, windowHeight)
 {
 	chessMap = new Map(0.6f, shader);
 	net = (Net*)(new Client);
@@ -184,7 +184,7 @@ void Game::FinishGame()
 	IsSceneFinished = true;
 }
 
-void Game::Draw(GLuint ModelMatrixID)
+void Game::Draw()
 {
 	if (myColor == Color::White)
 	{

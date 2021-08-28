@@ -29,12 +29,12 @@ public:
 	bool IsMyTurn = false;
 	bool IsGameFinished = false;
 	Map* chessMap;
-	Game(GL::Program* shader, Text* textPrinter);
-	Game(std::string ip, GL::Program* shader, Text* textPrinter);
+	Game(GL::Program* shader, Text* textPrinter, int windowWidth, int windowHeight);
+	Game(std::string ip, GL::Program* shader, Text* textPrinter, int windowWidth, int windowHeight);
 	void ProcessKeyboardInput(int key) override;
 	void ProcessMouseInput(std::vector<glm::vec3> ray) override;
 	void FinishGame();
-	void Draw(GLuint ModelMatrixID) override;
+	void Draw() override;
 	~Game();
 };
 
