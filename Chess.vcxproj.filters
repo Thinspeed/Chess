@@ -22,6 +22,11 @@
     <ClCompile Include="src\Net\Net.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
     <ClCompile Include="src\GL\Model.cpp" />
+    <ClCompile Include="src\GLFW\Text.cpp" />
+    <ClCompile Include="src\GL\Scene.cpp" />
+    <ClCompile Include="src\GL\Texture.cpp" />
+    <ClCompile Include="src\Game\MainMenu.cpp" />
+    <ClCompile Include="src\Game\EnterIPScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GLFW\gl.h" />
@@ -45,11 +50,18 @@
     <ClInclude Include="src\Net\Net.h" />
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\GL\Model.h" />
+    <ClInclude Include="src\GLFW\Text.h" />
+    <ClInclude Include="src\GL\Scene.h" />
+    <ClInclude Include="src\GL\Texture.h" />
+    <ClInclude Include="src\Game\MainMenu.h" />
+    <ClInclude Include="src\Game\EnterIPScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\glsl\defaultShader.vert" />
     <None Include="res\glsl\defaultShader.frag" />
     <None Include="res\glsl\3dShader.frag" />
     <None Include="res\glsl\3dShader.vert" />
+    <None Include="res\glsl\textShader.frag" />
+    <None Include="res\glsl\textShader.vert" />
   </ItemGroup>
 </Project>
