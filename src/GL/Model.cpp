@@ -95,13 +95,21 @@ void GL::Model::addMesh(aiMesh* mesh, const aiScene* scene)
 
 void GL::Model::Draw()
 {
+	shader->use();
+	if (diffuse != nullptr)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuse->Id);
+		glUniform1f(MaterialDiffuseID, 0);
+	}
+	
+	if (specular != nullptr)
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specular->Id);
+		glUniform1f(MaterialDiffuseID, 1);
+	}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, diffuse->Id);
-	glUniform1f(MaterialDiffuseID, 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, specular->Id);
-	glUniform1f(MaterialDiffuseID, 1);
 	float shininess = 32.0f;
 	glUniform1f(MaterialShininessID, shininess);
 	
