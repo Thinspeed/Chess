@@ -77,33 +77,33 @@ void Map::arrangePieces(GL::Program* shader)
 	whiteModel = new GL::Model("models/chess_models/Horse.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	map[0][1]->mPiece = new Rook(Color::White, Point(1, 0), cellWidth, whiteModel);
-	map[0][6]->mPiece = new Rook(Color::White, Point(6, 0), cellWidth, whiteModel);
-	map[7][1]->mPiece = new Rook(Color::Black, Point(1, 7), cellWidth, blackModel);
-	map[7][6]->mPiece = new Rook(Color::Black, Point(6, 7), cellWidth, blackModel);
+	map[0][1]->mPiece = new Horse(Color::White, Point(1, 0), cellWidth, whiteModel);
+	map[0][6]->mPiece = new Horse(Color::White, Point(6, 0), cellWidth, whiteModel);
+	map[7][1]->mPiece = new Horse(Color::Black, Point(1, 7), cellWidth, blackModel);
+	map[7][6]->mPiece = new Horse(Color::Black, Point(6, 7), cellWidth, blackModel);
 	
 	blackModel = new GL::Model("models/chess_models/Bishop.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
 	whiteModel = new GL::Model("models/chess_models/Bishop.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	map[0][2]->mPiece = new Rook(Color::White, Point(2, 0), cellWidth, whiteModel);
-	map[0][5]->mPiece = new Rook(Color::White, Point(5, 0), cellWidth, whiteModel);
-	map[7][2]->mPiece = new Rook(Color::Black, Point(2, 7), cellWidth, blackModel);
-	map[7][5]->mPiece = new Rook(Color::Black, Point(5, 7), cellWidth, blackModel);
+	map[0][2]->mPiece = new Officer(Color::White, Point(2, 0), cellWidth, whiteModel);
+	map[0][5]->mPiece = new Officer(Color::White, Point(5, 0), cellWidth, whiteModel);
+	map[7][2]->mPiece = new Officer(Color::Black, Point(2, 7), cellWidth, blackModel);
+	map[7][5]->mPiece = new Officer(Color::Black, Point(5, 7), cellWidth, blackModel);
 	
 	blackModel = new GL::Model("models/chess_models/Queen.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
 	whiteModel = new GL::Model("models/chess_models/Queen.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	map[0][3]->mPiece = new Rook(Color::White, Point(3, 0), cellWidth, whiteModel);
-	map[7][3]->mPiece = new Rook(Color::Black, Point(3, 7), cellWidth, blackModel);
+	map[0][3]->mPiece = new Queen(Color::White, Point(3, 0), cellWidth, whiteModel);
+	map[7][3]->mPiece = new Queen(Color::Black, Point(3, 7), cellWidth, blackModel);
 	
 	blackModel = new GL::Model("models/chess_models/King.obj", blackMarbleDiffuse, blackMarbleSpecular, shader);
 	whiteModel = new GL::Model("models/chess_models/King.obj", whiteMarbleDiffuse, whiteMarbleSpecular, shader);
 	models.push_back(blackModel);
 	models.push_back(whiteModel);
-	map[0][4]->mPiece = new Rook(Color::White, Point(4, 0), cellWidth, whiteModel);
-	map[7][4]->mPiece = new Rook(Color::Black, Point(4, 7), cellWidth, blackModel);
+	map[0][4]->mPiece = new King(Color::White, Point(4, 0), cellWidth, whiteModel);
+	map[7][4]->mPiece = new King(Color::Black, Point(4, 7), cellWidth, blackModel);
 	
 }
 
